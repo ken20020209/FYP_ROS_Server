@@ -29,7 +29,7 @@ class Camera(Node):
     def __init__(self,name='Camera'):
         super().__init__(name)
         self.subCamera = self.create_subscription(Image, 'camera/raw', self.subCammera, 10)
-        self.pubCamera = self.create_publisher(Image, 'camera/effected', 10)
+        self.pubCamera = self.create_publisher(Image, 'camera/processed', 10)
         self.bridge = CvBridge()
         self.img = None
         self.img_effected = None
