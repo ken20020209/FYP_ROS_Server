@@ -6,13 +6,19 @@ import time
 import cv2 as cv
 from cv_bridge import CvBridge
 import numpy
-
-
+from typing import Dict
+from multiprocessing import Process
+import subprocess
+import signal
 
 #ros2 lib
 import rclpy
 from rclpy.node import Node
 from service.srv import RegisterDog,GetDogList,UnregisterDog
+
+def startController(port,rosDomainId):
+    os.environ['ROS_DOMAIN_ID'] = str(rosDomainId)
+    os.system(f"ros2 launch basic RobotDogController.launch.py port:={port}")
 
 class RobotDogConnector(Node):
     #save the dog that registered
@@ -40,8 +46,19 @@ class RobotDogConnector(Node):
         response.id = rosDomainId
         
         self._logger.info(f"register dog {request.dog_id} with port {port} and rosDomainId {rosDomainId}")
-        #TODO: start the rosbrige with port and rosDomainId
-        
+
+        #start the controller and rosbrige with port and rosDomainId with multiprocessing 
+        #it can't kill node with terminate
+        # p = Process(target=startController,args=(port,rosDomainId))
+        # p.start()
+        # self.dogList[request.dog_id]["process"] = p
+
+        #start the controller and rosbrige with port and rosDomainId with subprocess
+        sp_env=os.environ.copy()
+        sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
+        sp = subprocess.Popen(["ros2","launch","basic","RobotDogController.launch.py",f"port:={port}"],env=sp_env)
+        self.dogList[request.dog_id]["process"] = sp
+
 
         #---------------------------------------------------
         return response
@@ -54,7 +71,16 @@ class RobotDogConnector(Node):
         #get the port and rosDomainId
         port = self.dogList[request.dog_id]["port"]
         rosDomainId = self.dogList[request.dog_id]["rosDomainId"]
-        #TODO: unregister the dog with dog_id kill the rosbridge 
+
+        # unregister the dog with dog_id kill the rosbridge 
+        #it can't kill node with terminate
+        # p:Process=self.dogList[request.dog_id]["process"]
+        # p.terminate()
+
+        #unregister the dog with dog_id kill the rosbridge with subprocess
+        sp:subprocess.Popen=self.dogList[request.dog_id]["process"]
+        sp.send_signal(signal.SIGINT)
+        
 
     
         #---------------------------------------------------
@@ -79,6 +105,7 @@ class RobotDogConnector(Node):
             response.dog_ids.append(key)
             response.ports.append(item["port"])
         return response
+    
 
 def main(args=None):
     rclpy.init(args=args)
