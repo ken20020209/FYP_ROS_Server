@@ -38,6 +38,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/RegisterDog.srv"
   "srv/GetDogList.srv"
   "srv/UnregisterDog.srv"
+  "msg/DogStatus.msg"
  )
 
 ament_package()

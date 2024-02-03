@@ -15,6 +15,7 @@ import signal
 import rclpy
 from rclpy.node import Node
 from service.srv import RegisterDog,GetDogList,UnregisterDog
+from service.msg import DogStatus
 
 def startController(port,rosDomainId):
     os.environ['ROS_DOMAIN_ID'] = str(rosDomainId)
@@ -29,9 +30,24 @@ class RobotDogConnector(Node):
 
     def __init__(self,name='RobotDogConnector'):
         super().__init__(name)
+        #register the service
         self.registerService = self.create_service(RegisterDog,'dog/reg',self.registerDog)
         self.getDogListService = self.create_service(GetDogList,'dog/list',self.getDogList)
         self.unregisterDogService = self.create_service(UnregisterDog,'dog/unreg',self.unregisterDog)
+
+        #set timer to check the dog status
+        self.create_timer(1,self.checkDogStatus)
+
+    def checkDogStatus(self):
+        #check the dog status
+        for key in list(self.dogList.keys()):
+            item=self.dogList[key]
+            self._logger.error(item["life"])
+            if(item["life"]<0):
+                self._logger.error(f"dog {key} is not response")
+                self.unregisterDog(UnregisterDog.Request(dog_id=key),UnregisterDog.Response())
+            else:
+                item["life"] -=1
     
     def registerDog(self,request:RegisterDog.Request, response:RegisterDog.Response):
         if(request.dog_id in self.dogList or request.dog_id==""):
@@ -58,9 +74,20 @@ class RobotDogConnector(Node):
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
         sp = subprocess.Popen(["ros2","launch","basic","RobotDogController.launch.py",f"port:={port}"],env=sp_env)
         self.dogList[request.dog_id]["process"] = sp
-
-
         #---------------------------------------------------
+
+        #create the dog/status subscriber
+        self.dogList[request.dog_id]["life"] = 10
+        self.dogList[request.dog_id]["battery"] = 100
+        def statusCallback(msg):
+            self.dogList[request.dog_id]["life"] +=1
+            self.dogList[request.dog_id]["battery"] = msg.battery
+            if(msg.status==-1):
+                self.dogList[request.dog_id]["life"] = -1
+        self.dogList[request.dog_id]["getDogStatus"] = self.create_subscription(DogStatus,f'{request.dog_id}/dog/status',statusCallback,10)
+        
+
+    
         return response
     def unregisterDog(self,request:UnregisterDog.Request, response:UnregisterDog.Response):
         #check if the dog_id is registered
@@ -80,14 +107,17 @@ class RobotDogConnector(Node):
         #unregister the dog with dog_id kill the rosbridge with subprocess
         sp:subprocess.Popen=self.dogList[request.dog_id]["process"]
         sp.send_signal(signal.SIGINT)
+        #---------------------------------------------------
+
+        #remove the dog/status subscriber
+        self.destroy_subscription(self.dogList[request.dog_id]["getDogStatus"])
         
 
-    
-        #---------------------------------------------------
         #add the port and rosDomainId back to the list
         self.ports.append(port)
         self.rosDomainIds.append(rosDomainId)
-        self.dogList.pop(request.dog_id)
+        # self.dogList.pop(request.dog_id)
+        del self.dogList[request.dog_id]
 
         #response
         response.result = True
@@ -104,6 +134,7 @@ class RobotDogConnector(Node):
         for key,item in self.dogList.items():
             response.dog_ids.append(key)
             response.ports.append(item["port"])
+            response.batterys.append(item["battery"])
         return response
     
 

@@ -1,3 +1,4 @@
 ---
 string[] dog_ids
 int32[] ports
+int32[] batterys
