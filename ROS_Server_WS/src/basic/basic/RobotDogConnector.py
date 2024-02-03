@@ -36,18 +36,18 @@ class RobotDogConnector(Node):
         self.unregisterDogService = self.create_service(UnregisterDog,'dog/unreg',self.unregisterDog)
 
         #set timer to check the dog status
-        self.create_timer(1,self.checkDogStatus)
+        self.create_timer(5,self.checkDogStatus)
 
     def checkDogStatus(self):
         #check the dog status
         for key in list(self.dogList.keys()):
             item=self.dogList[key]
-            self._logger.error(item["life"])
+            # self._logger.error(str(item["life"]))
             if(item["life"]<0):
                 self._logger.error(f"dog {key} is not response")
                 self.unregisterDog(UnregisterDog.Request(dog_id=key),UnregisterDog.Response())
             else:
-                item["life"] -=1
+                item["life"] -=5
     
     def registerDog(self,request:RegisterDog.Request, response:RegisterDog.Response):
         if(request.dog_id in self.dogList or request.dog_id==""):
@@ -80,7 +80,8 @@ class RobotDogConnector(Node):
         self.dogList[request.dog_id]["life"] = 10
         self.dogList[request.dog_id]["battery"] = 100
         def statusCallback(msg):
-            self.dogList[request.dog_id]["life"] +=1
+            # self._logger.error(f"get status from {request.dog_id}")
+            self.dogList[request.dog_id]["life"] +=5
             self.dogList[request.dog_id]["battery"] = msg.battery
             if(msg.status==-1):
                 self.dogList[request.dog_id]["life"] = -1
