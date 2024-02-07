@@ -65,7 +65,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                # 'slam_params_file': LaunchConfiguration("slam_params_file")
+                'slam_params_file': os.path.join('basic', 'config', 'mapper_params_online_async.yaml')
             }.items()
         )
     ])
