@@ -14,8 +14,8 @@ import signal
 #ros2 lib
 import rclpy
 from rclpy.node import Node
-from service.srv import RegisterDog,GetDogList,UnregisterDog
-from service.msg import DogStatus
+from message.srv import RegisterDog,GetDogList,UnregisterDog
+from message.msg import DogStatus
 
 def startController(port,rosDomainId):
     os.environ['ROS_DOMAIN_ID'] = str(rosDomainId)
