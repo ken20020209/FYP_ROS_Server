@@ -19,6 +19,34 @@
 
 using namespace rf2o;
 
+#define ODOM_POSE_COVARIANCE  {1e-3, 0, 0, 0, 0, 0, \
+							   0, 1e-3, 0, 0, 0, 0, \
+							   0, 0, 1e6, 0, 0, 0, \
+							   0, 0, 0, 1e6, 0, 0,\
+							   0, 0, 0, 0, 1e6, 0,\
+							   0, 0, 0, 0, 0, 1e3}
+
+#define ODOM_POSE_COVARIANCE2 {1e-9, 0, 0, 0, 0, 0, \
+							   0, 1e-3, 1e-9, 0, 0, 0,\
+							   0, 0, 1e6, 0, 0, 0,\
+                               0, 0, 0, 1e6, 0, 0,\
+                               0, 0, 0, 0, 1e6, 0,\
+                               0, 0, 0, 0, 0, 1e-9}
+
+#define ODOM_TWIST_COVARIANCE {1e-3, 0, 0, 0, 0, 0,\
+							   0, 1e-3, 0, 0, 0, 0,\
+                               0, 0, 1e6, 0, 0, 0, \
+                               0, 0, 0, 1e6, 0, 0, \
+                               0, 0, 0, 0, 1e6, 0, \
+                               0, 0, 0, 0, 0, 1e3}
+
+#define ODOM_TWIST_COVARIANCE2 {1e-9, 0, 0, 0, 0, 0,\
+								0, 1e-3, 1e-9, 0, 0, 0, \
+								0, 0, 1e6, 0, 0, 0,\
+                                0, 0, 0, 1e6, 0, 0,\
+                                0, 0, 0, 0, 1e6, 0,\
+                                0, 0, 0, 0, 0, 1e-9}
+
 CLaserOdometry2DNode::CLaserOdometry2DNode(): Node("CLaserOdometry2DNode")
 {
   RCLCPP_INFO(get_logger(), "Initializing RF2O node...");
@@ -223,6 +251,19 @@ void CLaserOdometry2DNode::publish()
   odom.twist.twist.linear.x = rf2o_ref.lin_speed;    //linear speed
   odom.twist.twist.linear.y = 0.0;
   odom.twist.twist.angular.z = rf2o_ref.ang_speed;   //angular speed
+
+  //set the covariance
+  if(rf2o_ref.lin_speed==0 && rf2o_ref.ang_speed==0)
+  {
+    odom.pose.covariance= ODOM_POSE_COVARIANCE2;
+    odom.twist.covariance= ODOM_TWIST_COVARIANCE2;
+  }
+  else
+  {
+    odom.pose.covariance= ODOM_POSE_COVARIANCE;
+    odom.twist.covariance= ODOM_TWIST_COVARIANCE;
+  }
+
   //publish the message
   odom_pub->publish(odom);
 

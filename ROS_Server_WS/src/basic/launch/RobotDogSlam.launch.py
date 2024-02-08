@@ -14,6 +14,7 @@
 
 import os
 from launch import LaunchDescription
+from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -24,6 +25,9 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+
+    basic_dir = get_package_share_directory('basic')
+
     navigation_launch_path = PathJoinSubstitution(
         [FindPackageShare('nav2_bringup'), 'launch', 'navigation_launch.py']
     )
@@ -51,13 +55,14 @@ def generate_launch_description():
             executable='ekf_node',
             name='ekf_filter_node',
             output='screen',
-            parameters=[os.path.join('basic', 'config/ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}]
+            parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}]
         ),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(navigation_launch_path),
             launch_arguments={
-                'use_sim_time': LaunchConfiguration("sim")
+                'use_sim_time': LaunchConfiguration("sim"),
+                'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml')
             }.items()
         ),
 
@@ -65,7 +70,14 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                'slam_params_file': os.path.join('basic', 'config', 'mapper_params_online_async.yaml')
+                'slam_params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
             }.items()
+        ),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', os.path.join(basic_dir, 'rviz', ' nav2_default_view.rviz')],
         )
     ])
