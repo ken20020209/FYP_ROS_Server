@@ -17,7 +17,7 @@ def generate_launch_description():
     return LaunchDescription([
             DeclareLaunchArgument(
                 name='publish_tf',
-                default_value='True',
+                default_value='False',
                 description='Publish the odometry transform'
             ),
             Node(

@@ -16,7 +16,7 @@ import os
 from launch import LaunchDescription
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution,PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition
 from launch.substitutions import EnvironmentVariable
@@ -36,30 +36,35 @@ def generate_launch_description():
         [FindPackageShare('slam_toolbox'), 'launch', 'online_async_launch.py']
     )
     
-    rf2o_launch_path = PathJoinSubstitution(
-        [FindPackageShare('rf2o_laser_odometry'), 'launch', 'rf2o_laser_odometry.launch.py']
+    rf2o_launch_tf_path = PathJoinSubstitution(
+        [FindPackageShare('rf2o_laser_odometry'), 'launch', 'rf2o_laser_odometry_tf.launch.py']
+    )
+    rf2o_launch_no_tf_path = PathJoinSubstitution(
+        [FindPackageShare('rf2o_laser_odometry'), 'launch', 'rf2o_laser_odometry_no_tf.launch.py']
     )
     
 
     return LaunchDescription([
         DeclareLaunchArgument(
             name='sim', 
-            default_value='false',
+            default_value='False',
             description='Enable use_sime_time to true'
         ),
         DeclareLaunchArgument(
             name='ekf_node',
-            default_value='true',
+            default_value='True',
             description='Enable ekf_node'
         )
         ,
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(rf2o_launch_path),
-            launch_arguments={
-                'use_sim_time': LaunchConfiguration("sim"),
-                'publish_tf':  'true' if LaunchConfiguration("ekf_node") == 'true' else 'false'
-            }.items()
+            PythonLaunchDescriptionSource(rf2o_launch_no_tf_path),
+            condition=IfCondition(LaunchConfiguration('ekf_node')),
         ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(rf2o_launch_tf_path),
+            condition=IfCondition(PythonExpression(['not ',LaunchConfiguration('ekf_node')])),
+        )
+        ,
         Node(
             package='robot_localization',
             executable='ekf_node',
