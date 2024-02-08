@@ -253,16 +253,16 @@ void CLaserOdometry2DNode::publish()
   odom.twist.twist.angular.z = rf2o_ref.ang_speed;   //angular speed
 
   //set the covariance
-  if(rf2o_ref.lin_speed==0 && rf2o_ref.ang_speed==0)
-  {
-    odom.pose.covariance= ODOM_POSE_COVARIANCE2;
-    odom.twist.covariance= ODOM_TWIST_COVARIANCE2;
-  }
-  else
-  {
-    odom.pose.covariance= ODOM_POSE_COVARIANCE;
-    odom.twist.covariance= ODOM_TWIST_COVARIANCE;
-  }
+  // if(rf2o_ref.lin_speed==0 && rf2o_ref.ang_speed==0)
+  // {
+  //   odom.pose.covariance= ODOM_POSE_COVARIANCE2;
+  //   odom.twist.covariance= ODOM_TWIST_COVARIANCE2;
+  // }
+  // else
+  // {
+  //   odom.pose.covariance= ODOM_POSE_COVARIANCE;
+  //   odom.twist.covariance= ODOM_TWIST_COVARIANCE;
+  // }
 
   //publish the message
   odom_pub->publish(odom);
