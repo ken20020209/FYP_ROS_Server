@@ -47,14 +47,25 @@ def generate_launch_description():
             default_value='false',
             description='Enable use_sime_time to true'
         ),
+        DeclareLaunchArgument(
+            name='ekf_node',
+            default_value='true',
+            description='Enable ekf_node'
+        )
+        ,
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(rf2o_launch_path)
+            PythonLaunchDescriptionSource(rf2o_launch_path),
+            launch_arguments={
+                'use_sim_time': LaunchConfiguration("sim"),
+                'publish_tf':  'true' if LaunchConfiguration("ekf_node") == 'true' else 'false'
+            }.items()
         ),
         Node(
             package='robot_localization',
             executable='ekf_node',
             name='ekf_filter_node',
             output='screen',
+            condition=IfCondition(LaunchConfiguration('ekf_node')),
             parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}]
         ),
 
