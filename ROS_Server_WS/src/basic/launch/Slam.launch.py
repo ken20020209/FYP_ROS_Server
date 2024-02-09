@@ -52,7 +52,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name='ekf_node',
-            default_value='True',
+            default_value='False',
             description='Enable ekf_node'
         )
         ,
