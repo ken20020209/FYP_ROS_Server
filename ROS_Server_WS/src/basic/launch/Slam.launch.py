@@ -58,7 +58,7 @@ def generate_launch_description():
         ,
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(rf2o_launch_no_tf_path),
-            condition=IfCondition(LaunchConfiguration('ekf_node')),
+            condition=IfCondition(LaunchConfiguration('ekf_node'))
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(rf2o_launch_tf_path),
@@ -71,7 +71,8 @@ def generate_launch_description():
             name='ekf_filter_node',
             output='screen',
             condition=IfCondition(LaunchConfiguration('ekf_node')),
-            parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}]
+            parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}],
+            remappings=[('/odometry/filtered','/odom')]
         ),
 
         IncludeLaunchDescription(
