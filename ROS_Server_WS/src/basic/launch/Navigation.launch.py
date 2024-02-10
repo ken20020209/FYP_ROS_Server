@@ -84,7 +84,6 @@ def generate_launch_description():
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
                 'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml'),
-                'autostart': 'True',
             }.items()
         ),
 
@@ -100,8 +99,7 @@ def generate_launch_description():
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
                 'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml'),
-                'map': os.path.join(basic_dir, 'map', 'map.yaml'),
-                'autostart': 'True',
+                'map': os.path.join(basic_dir, 'map', 'map.yaml')
             }.items()
         ),
         Node(
