@@ -1,0 +1,3 @@
+[submodule "ROS_Server_WS/src/rosbridge_suite"]
+	path = ROS_Server_WS/src/rosbridge_suite
+	url = https://github.com/ken20020209/rosbridge_suite
