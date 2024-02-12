@@ -25,7 +25,7 @@ ENV SHELL /bin/bash
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 # USER $USERNAME
 # CMD ["/bin/bash"]
-# LABEL maintainer="ken20020209@gmail.com"
+LABEL maintainer="ken20020209 <ken20020209@gmail.com>"
 
 ADD /src /ROS_Server_WS/src
 RUN . /opt/ros/foxy/setup.sh && \
@@ -33,3 +33,12 @@ RUN . /opt/ros/foxy/setup.sh && \
     rosdep install --from-paths src --ignore-src -r -y &&\
     colcon build
 
+ENV ROS_DISTRO=foxy
+ENV ROS_DOMAIN_ID=16
+
+# CMD [ "source","/ROS_Server_WS/install/setup.bash" ]
+# CMD [ "ros2","launch","basic","Connector.launch.py" ]
+
+COPY /docker/entrypoint.sh /
+ENTRYPOINT [ "sh","/entrypoint.sh" ]
+CMD [ "/bin/bash" ]
