@@ -1,0 +1,4 @@
+#use for turn on or turn off function
+bool switch
+---
+string result

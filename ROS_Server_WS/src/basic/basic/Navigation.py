@@ -13,6 +13,9 @@ import rclpy
 from rclpy.node import Node
 
 from geometry_msgs.msg import PoseStamped,Pose
+from std_msgs.msg import Bool,String
+
+
 from message.srv import MoveToPoint,MoveToPoints,PatrolPoints,StopNavigation,FollowObject
 
 from .lib.robot_navigator import BasicNavigator
@@ -20,21 +23,39 @@ from .lib.robot_navigator import BasicNavigator
 class Navigation(Node):
     def __init__(self,name='Navigation'):
         super().__init__('name')
-        
+
+        self.isTaskComplete=True
+        self.feedback = None
+
         self.navigator = BasicNavigator()
         self.navigator.lifecycleStartup()
 
+        #create topic publisher
+        self.isTaskComplete_publisher = self.create_publisher(Bool,'nav2/is_task_complete',10)
+        self.feedback_publisher = self.create_publisher(String,'nav2/feedback',10)
+
+        # create service
         self.moveToPoint_client = self.create_service(MoveToPoint,'nav2/move_to_point',self.moveToPoint)
         self.moveToPoints_client = self.create_service(MoveToPoints,'nav2/move_to_points',self.moveToPoints)
         self.patrolPoints_client = self.create_service(PatrolPoints,'nav2/patrol_points',self.patrolPoints)
         self.stopNavigation_client = self.create_service(StopNavigation,'nav2/stop_navigation',self.stopNavigation)
         self.followObject_client = self.create_service(FollowObject,'nav2/follow_object',self.followObject)
 
+
+
         self.create_timer(1,self.update)
     
     def update(self):
         # print(self.navigator.getFeedback)
-        print(self.navigator.isTaskComplete())
+        self.isTaskComplete = self.navigator.isTaskComplete()
+        if(self.isTaskComplete):
+            self.feedback="idle"
+
+        self.isTaskComplete_publisher.publish(Bool(data=self.isTaskComplete))
+        self.feedback_publisher.publish(String(data=self.feedback))
+
+        #debug message
+        # print(self.navigator.isTaskComplete())
         pass
 
     def _createPoseStamped(self,pose:Pose):
@@ -49,6 +70,7 @@ class Navigation(Node):
         response.result='failed'
         if self.navigator.goToPose(goal_pose):
             response.result='success'
+            self.feedback="moving to point"
         return response
     
     def moveToPoints(self,request:MoveToPoints.Request,response:MoveToPoints.Response):
@@ -59,6 +81,7 @@ class Navigation(Node):
         response.result='failed'
         if self.navigator.followWaypoints(goal_poses):
             response.result='success'
+            self.feedback="moving to points"
         return response
     
     def patrolPoints(self,request:PatrolPoints.Request,response:PatrolPoints.Response):
@@ -68,6 +91,7 @@ class Navigation(Node):
         response.result='failed'
         if self.navigator.patrolWaypoints(goal_poses):
             response.result='success'
+            self.feedback="patrolling points"
         return response
     
     def stopNavigation(self,request:PatrolPoints.Request,response:PatrolPoints.Response):

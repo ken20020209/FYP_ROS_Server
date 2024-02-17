@@ -61,6 +61,7 @@ class BasicNavigator(Node):
         self.feedback = None
         self.status = None
 
+
         amcl_pose_qos = QoSProfile(
             durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
             reliability=QoSReliabilityPolicy.RELIABLE,

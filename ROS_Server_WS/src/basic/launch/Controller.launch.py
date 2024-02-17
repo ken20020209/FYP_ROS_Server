@@ -13,7 +13,7 @@ def generate_launch_description():
         Node(
             package='basic',
             namespace='',
-            executable='Camera'
+            executable='Controller',
         ),
         # start rosbrige server
         Node(

@@ -13,7 +13,7 @@ def generate_launch_description():
         Node(
             package='basic',
             namespace='',
-            executable='RobotDogConnector'
+            executable='Connector'
         ),
         Node(
             package='rosbridge_server',
