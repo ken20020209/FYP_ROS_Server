@@ -12,6 +12,7 @@ from launch.substitutions import ThisLaunchFileDir
 from launch.conditions import IfCondition
  
 def generate_launch_description():
+    basic_dir = get_package_share_directory('basic')
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     cartographer_prefix = get_package_share_directory('basic')
     cartographer_config_dir = LaunchConfiguration('cartographer_config_dir', default=os.path.join(
@@ -75,8 +76,8 @@ def generate_launch_description():
                 name='rviz2',
                 parameters=[{'use_sim_time': use_sim_time}],
                 condition=IfCondition(rviz),
-                output='screen')
-    
+                output='screen',
+                arguments=['-d', os.path.join(basic_dir, 'rviz', 'nav2_default_view.rviz')])
     occupancy_grid_launch=IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/occupancy_grid.launch.py']),
                 launch_arguments={'use_sim_time': use_sim_time, 'resolution': resolution,

@@ -17,6 +17,7 @@ setup(
             (os.path.join('share', package_name,"rviz"), glob('rviz/*')),
             (os.path.join('share', package_name,"map/cartographer"), glob('map/cartographer/*')),
             (os.path.join('share', package_name,"map/slam_toolbox"), glob('map/slam_toolbox/*')),
+            (os.path.join('share', package_name,"map/amcl"), glob('map/amcl/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

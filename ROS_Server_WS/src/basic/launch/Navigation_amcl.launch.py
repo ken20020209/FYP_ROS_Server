@@ -47,7 +47,7 @@ def generate_launch_description():
     ekf_node_start = LaunchConfiguration('ekf_node', default='False')
     rviz = LaunchConfiguration('rviz', default='True')
     namespace = LaunchConfiguration('namespace', default='')
-    map = LaunchConfiguration('map', default=os.path.join(basic_dir, 'map','slam_toolbox', 'map.yaml'))
+    map = LaunchConfiguration('map', default=os.path.join(basic_dir, 'map','amcl', 'map.yaml'))
 
     use_sim_time_declare=DeclareLaunchArgument(
         'sim',

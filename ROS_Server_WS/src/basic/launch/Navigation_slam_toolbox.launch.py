@@ -104,6 +104,13 @@ def generate_launch_description():
             'params_file': os.path.join(basic_dir, 'config', 'nav2_params_no_amcl_tf.yaml'),
         }.items()
     )
+    slam_launch=IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(slam_launch_path),
+        launch_arguments={
+            'use_sim_time': LaunchConfiguration("sim"),
+            'params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async_loc.yaml')
+        }.items()
+    )
     localizer_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(localizer_launch_path),
         launch_arguments={
@@ -127,10 +134,12 @@ def generate_launch_description():
         rf2o_launch_tf,
         robot_localization_node,
         nav2_launch,
-        localizer_launch,
-        rviz
+        # localizer_launch,
+        rviz,
+        slam_launch
     ])
 
+    
     launch_description = LaunchDescription()
 
     launch_description.add_action(use_sim_time_declare)
