@@ -44,7 +44,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/PatrolPoints.srv"
   "srv/FollowObject.srv"
   "srv/StopNavigation.srv"
-  
+  "srv/SwitchService.srv"
+
   "msg/DogStatus.msg"
 
   DEPENDENCIES geometry_msgs

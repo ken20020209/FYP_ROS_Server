@@ -5,9 +5,14 @@ from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
     return LaunchDescription([  
+        DeclareLaunchArgument(
+            'namespace',
+            default_value='',
+            description='Namespace for the controller'
+        ),
         Node(
             package='basic',
-            namespace='',
+            namespace=LaunchConfiguration('namespace'),
             executable='Camera'
         ),
     ])

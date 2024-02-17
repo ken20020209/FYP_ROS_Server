@@ -15,13 +15,13 @@
 import os
 from launch import LaunchDescription
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription,GroupAction
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution,PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition
 from launch.substitutions import EnvironmentVariable
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node
+from launch_ros.actions import Node,PushRosNamespace
 
 
 def generate_launch_description():
@@ -42,64 +42,85 @@ def generate_launch_description():
     rf2o_launch_no_tf_path = PathJoinSubstitution(
         [FindPackageShare('rf2o_laser_odometry'), 'launch', 'rf2o_laser_odometry_no_tf.launch.py']
     )
-    
 
-    return LaunchDescription([
-        DeclareLaunchArgument(
+    ekf_node_start = LaunchConfiguration('ekf_node')
+    namespace = LaunchConfiguration('namespace', default='')
+    
+    sim_cmd=DeclareLaunchArgument(
             name='sim', 
             default_value='False',
             description='Enable use_sime_time to true'
-        ),
-        DeclareLaunchArgument(
+        )
+    ekf_node_cmd=DeclareLaunchArgument(
             name='ekf_node',
             default_value='False',
             description='Enable ekf_node'
-        ),
-        DeclareLaunchArgument(
+        )
+    rviz_cmd=DeclareLaunchArgument(
             name='rviz',
             default_value='True',
             description='Enable rviz'
-        ),  
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(rf2o_launch_no_tf_path),
-            condition=IfCondition(LaunchConfiguration('ekf_node'))
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(rf2o_launch_tf_path),
-            condition=IfCondition(PythonExpression(['not ',LaunchConfiguration('ekf_node')])),
         )
-        ,
-        Node(
-            package='robot_localization',
-            executable='ekf_node',
-            name='ekf_filter_node',
-            output='screen',
-            condition=IfCondition(LaunchConfiguration('ekf_node')),
-            parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}],
-            remappings=[('/odometry/filtered','/odom')]
-        ),
+    namespace_cmd=DeclareLaunchArgument(    
+                                'namespace',
+                                default_value='',
+                                description='Namespace for the controller')
+    
+    rf2o_launch_no_tf=IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(rf2o_launch_no_tf_path),
+        condition=IfCondition(ekf_node_start)
+    )
+    rf2o_launch_tf=IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(rf2o_launch_tf_path),
+        condition=IfCondition(PythonExpression(['not ',ekf_node_start])),
+    )
+    ekf_node=Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        condition=IfCondition(ekf_node_start),
+        parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}],
+        remappings=[('/odometry/filtered','/odom')]
+    )
+    navigation_launch=IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(navigation_launch_path),
+        launch_arguments={
+            'use_sim_time': LaunchConfiguration("sim"),
+            'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml')
+        }.items()
+    )
+    slam_launch=IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(slam_launch_path),
+        launch_arguments={
+            'use_sim_time': LaunchConfiguration("sim"),
+            'slam_params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
+        }.items()
+    )
+    rviz2=Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('rviz')),
+        arguments=['-d', os.path.join(basic_dir, 'rviz', 'nav2_default_view.rviz')],
+    )
+    
+    groupAction=GroupAction(actions=[PushRosNamespace(namespace),
+                                     rf2o_launch_no_tf,
+                                     rf2o_launch_tf,
+                                     ekf_node,
+                                     navigation_launch,
+                                     slam_launch,
+                                     rviz2])
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(navigation_launch_path),
-            launch_arguments={
-                'use_sim_time': LaunchConfiguration("sim"),
-                'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml')
-            }.items()
-        ),
+    launchConfiguration=LaunchDescription()
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(slam_launch_path),
-            launch_arguments={
-                'use_sim_time': LaunchConfiguration("sim"),
-                'slam_params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
-            }.items()
-        ),
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2',
-            output='screen',
-            condition=IfCondition(LaunchConfiguration('rviz')),
-            arguments=['-d', os.path.join(basic_dir, 'rviz', ' nav2_default_view.rviz')],
-        )
-    ])
+    launchConfiguration.add_action(sim_cmd)
+    launchConfiguration.add_action(ekf_node_cmd)
+    launchConfiguration.add_action(rviz_cmd)
+    launchConfiguration.add_action(namespace_cmd)
+    
+    launchConfiguration.add_action(groupAction)
+
+    return launchConfiguration

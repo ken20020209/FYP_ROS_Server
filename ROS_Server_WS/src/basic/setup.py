@@ -30,6 +30,8 @@ setup(
         'RobotDogConnector = basic.Connector:main',
         'Camera = basic.Camera:main',
         'Navigation = basic.Navigation:main',
+        'Controller = basic.Controller:main',
+        'Mapping = basic.Mapping:main',
         ],
     },
 )

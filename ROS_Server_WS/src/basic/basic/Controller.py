@@ -57,13 +57,13 @@ class Controller(Node):
 
     def camera_switch(self,request,response):
         response.result = "fail to switch the camera"
-        if request.switch == self.camera:
+        if request.switch_service == self.camera:
             response.result = "the camera is already in the state"
             return response
-        if request.switch == True:
+        if request.switch_service == True:
             self.camera = True
             response.result = "the camera started"
-            self.camera_sp = subprocess.Popen(["ros2","launch","basic","Camera.launch.py"],env=os.environ.copy())
+            self.camera_sp = subprocess.Popen(["ros2","launch","basic","Camera.launch.py",f"namespace:={self.get_namespace()}"],env=os.environ.copy())
         else:
             self.camera = False
             response.result = "the camera closed"
@@ -76,13 +76,13 @@ class Controller(Node):
         if self.slam == True:
             response.result = "cant start the navigation while the slam on"
             return response
-        if request.switch == self.navigation:
+        if request.switch_service == self.navigation:
             response.result = "the navigation is already in the state"
             return response
-        if request.switch == True:
+        if request.switch_service == True:
             self.navigation = True
             response.result = "the navigation started"
-            self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py"],env=os.environ.copy())
+            self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py",f"namespace:={self.get_namespace()}"],env=os.environ.copy())
         else:
             self.navigation = False
             response.result = "the navigation closed"
@@ -94,13 +94,13 @@ class Controller(Node):
         if(self.navigation==True):
             response.result = "cant start the slam while the navigation on"
             return response
-        if request.switch == self.slam:
+        if request.switch_service == self.slam:
             response.result = "the slam is already in the state"
             return response
-        if request.switch == True:
+        if request.switch_service == True:
             self.slam = True
             response.result = "the slam started"
-            self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py"],env=os.environ.copy())
+            self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py",f"namespace:={self.get_namespace()}"],env=os.environ.copy())
         else:
             self.slam = False
             response.result = "the slam closed"
@@ -108,4 +108,12 @@ class Controller(Node):
             self.slam_sp = None
         return response
 
-        
+def main(args=None):
+    rclpy.init(args=args)
+    controller = Controller()
+    rclpy.spin(controller)
+    controller.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

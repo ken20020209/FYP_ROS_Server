@@ -72,7 +72,7 @@ class RobotDogConnector(Node):
         #start the controller and rosbrige with port and rosDomainId with subprocess
         sp_env=os.environ.copy()
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
-        sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env)
+        sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
         self.dogList[request.dog_id]["process"] = sp
         #---------------------------------------------------
 

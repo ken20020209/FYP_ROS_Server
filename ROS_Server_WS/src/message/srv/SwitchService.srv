@@ -1,4 +1,4 @@
 #use for turn on or turn off function
-bool switch
+bool switch_service
 ---
 string result
