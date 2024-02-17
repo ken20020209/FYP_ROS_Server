@@ -11,6 +11,7 @@
   <depend>nav2_bringup</depend>
   <depend>rosbridge_server</depend>
   <depend>slam_toolbox</depend>
+  <depend>cartographer_ros</depend>
   <!-- <depend>rf2o_laser_odometry</depend> -->
 
   <exec_depend>robot_localization</exec_depend>

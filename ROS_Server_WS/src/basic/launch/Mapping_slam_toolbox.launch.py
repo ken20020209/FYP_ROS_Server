@@ -35,10 +35,6 @@ def generate_launch_description():
     slam_launch_path = PathJoinSubstitution(
         [FindPackageShare('slam_toolbox'), 'launch', 'online_async_launch.py']
     )
-
-    localizer_launch_path = PathJoinSubstitution(
-        [FindPackageShare('nav2_bringup'), 'launch', 'localization_launch.py']
-    )
     
     rf2o_launch_tf_path = PathJoinSubstitution(
         [FindPackageShare('rf2o_laser_odometry'), 'launch', 'rf2o_laser_odometry_tf.launch.py']
@@ -58,8 +54,12 @@ def generate_launch_description():
             name='ekf_node',
             default_value='False',
             description='Enable ekf_node'
-        )
-        ,
+        ),
+        DeclareLaunchArgument(
+            name='rviz',
+            default_value='True',
+            description='Enable rviz'
+        ),  
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(rf2o_launch_no_tf_path),
             condition=IfCondition(LaunchConfiguration('ekf_node'))
@@ -83,23 +83,15 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(navigation_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml'),
+                'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml')
             }.items()
         ),
 
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource(slam_launch_path),
-        #     launch_arguments={
-        #         'use_sim_time': LaunchConfiguration("sim"),
-        #         'slam_params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
-        #     }.items()
-        # ),
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(localizer_launch_path),
+            PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                'params_file': os.path.join(basic_dir, 'config', 'nav2_params.yaml'),
-                'map': os.path.join(basic_dir, 'map', 'map.yaml')
+                'slam_params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
             }.items()
         ),
         Node(
@@ -107,6 +99,7 @@ def generate_launch_description():
             executable='rviz2',
             name='rviz2',
             output='screen',
+            condition=IfCondition(LaunchConfiguration('rviz')),
             arguments=['-d', os.path.join(basic_dir, 'rviz', ' nav2_default_view.rviz')],
         )
     ])
