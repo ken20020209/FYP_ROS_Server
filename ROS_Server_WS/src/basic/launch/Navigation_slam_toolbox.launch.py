@@ -51,8 +51,14 @@ def generate_launch_description():
     ekf_node_start = LaunchConfiguration('ekf_node', default='False')
     rviz = LaunchConfiguration('rviz', default='True')
     namespace = LaunchConfiguration('namespace', default='')
-    map = LaunchConfiguration('map', default=os.path.join(basic_dir, 'map','slam_toolbox', 'map.yaml'))
+    map = LaunchConfiguration('map', default=os.path.join(basic_dir, 'map','slam_toolbox', 'mapa'))
+    init_pose=LaunchConfiguration('initial_pose', default='[ 0.0, 0.0, 0.0]')
 
+    init_pose_declare=DeclareLaunchArgument(
+        'initial_pose',
+        default_value=init_pose,
+        description='Enable initial_pose'
+    )
     use_sim_time_declare=DeclareLaunchArgument(
         'sim',
         default_value='False',
@@ -75,7 +81,7 @@ def generate_launch_description():
     )
     map_declare=DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(basic_dir, 'map','slam_toolbox', 'map.yaml'),
+        default_value=map,
         description='Full path to map file to load'
     )
 
@@ -108,17 +114,19 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(slam_launch_path),
         launch_arguments={
             'use_sim_time': LaunchConfiguration("sim"),
-            'params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async_loc.yaml')
+            'params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async_loc.yaml'),
+            'map':map,
+            'initial_pose':init_pose
         }.items()
     )
-    localizer_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(localizer_launch_path),
-        launch_arguments={
-            'use_sim_time': LaunchConfiguration("sim"),
-            'params_file': os.path.join(basic_dir, 'config', 'nav2_params_no_amcl_tf.yaml'),
-            'map': map,
-        }.items()
-    )
+    # localizer_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(localizer_launch_path),
+    #     launch_arguments={
+    #         'use_sim_time': LaunchConfiguration("sim"),
+    #         'params_file': os.path.join(basic_dir, 'config', 'nav2_params_no_amcl_tf.yaml'),
+    #         'map': map,
+    #     }.items()
+    # )
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -147,6 +155,7 @@ def generate_launch_description():
     launch_description.add_action(rviz_declare)
     launch_description.add_action(namespace_declare)
     launch_description.add_action(map_declare)
+    launch_description.add_action(init_pose_declare)
 
     launch_description.add_action(group)
 
