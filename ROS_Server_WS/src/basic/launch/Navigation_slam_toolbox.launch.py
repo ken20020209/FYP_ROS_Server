@@ -33,7 +33,7 @@ def generate_launch_description():
     )
 
     slam_launch_path = PathJoinSubstitution(
-        [FindPackageShare('slam_toolbox'), 'launch', 'online_async_launch.py']
+        [FindPackageShare('slam_toolbox'), 'launch', 'localization_launch.py']
     )
 
     localizer_launch_path = PathJoinSubstitution(
