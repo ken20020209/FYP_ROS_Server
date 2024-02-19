@@ -133,7 +133,7 @@ def generate_launch_description():
         name='rviz2',
         output='screen',
         condition=IfCondition(LaunchConfiguration('rviz')),
-        arguments=['-d', os.path.join(basic_dir, 'rviz', ' nav2_default_view.rviz')],
+        arguments=['-d', os.path.join(basic_dir, 'rviz', 'nav2_default_view.rviz')],
     )
 
     group = GroupAction(actions=[
