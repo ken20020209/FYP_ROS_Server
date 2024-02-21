@@ -28,7 +28,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        'RobotDogConnector = basic.Connector:main',
+        'Connector = basic.Connector:main',
         'Camera = basic.Camera:main',
         'Navigation = basic.Navigation:main',
         'Controller = basic.Controller:main',

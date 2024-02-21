@@ -27,4 +27,11 @@ def generate_launch_description():
             executable='rosbridge_websocket',
             parameters=[{'port': LaunchConfiguration('port')}]
         ),
+        Node(
+            package='basic',
+            # namespace=LaunchConfiguration('namespace'),
+            executable='Camera',
+            output='screen'
+
+        )
     ])
