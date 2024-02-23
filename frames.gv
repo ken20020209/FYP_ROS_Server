@@ -1,0 +1,25 @@
+digraph G {
+"map" -> "RobotDogConnector/odom"[label=" Broadcaster: default_authority\nAverage rate: 20.301\nBuffer length: 4.975\nMost recent transform: 1708698616.651636\nOldest transform: 1708698611.676505\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/laser_frame"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"RobotDogConnector/base_footprint" -> "RobotDogConnector/base_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"RobotDogConnector/odom" -> "RobotDogConnector/base_footprint"[label=" Broadcaster: default_authority\nAverage rate: 5.226\nBuffer length: 4.975\nMost recent transform: 1708698616.151636\nOldest transform: 1708698611.176505\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/camera_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/imu_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/laser_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/lf_hip_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/lf_upper_leg_link" -> "RobotDogConnector/lf_lower_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/lf_hip_link" -> "RobotDogConnector/lf_upper_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/lh_hip_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/lh_upper_leg_link" -> "RobotDogConnector/lh_lower_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/lh_hip_link" -> "RobotDogConnector/lh_upper_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/rf_hip_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/rf_upper_leg_link" -> "RobotDogConnector/rf_lower_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/rf_hip_link" -> "RobotDogConnector/rf_upper_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/base_link" -> "RobotDogConnector/rh_hip_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/rh_upper_leg_link" -> "RobotDogConnector/rh_lower_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+"RobotDogConnector/rh_hip_link" -> "RobotDogConnector/rh_upper_leg_link"[label=" Broadcaster: default_authority\nAverage rate: 9.13\nBuffer length: 4.929\nMost recent transform: 1708698616.246625\nOldest transform: 1708698611.317901\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1708698615.781225"[ shape=plaintext ] ;
+}->"map";
+}

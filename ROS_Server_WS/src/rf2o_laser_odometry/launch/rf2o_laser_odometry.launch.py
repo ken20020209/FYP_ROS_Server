@@ -13,8 +13,14 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 
 def generate_launch_description():
-
+    namespace=LaunchConfiguration('namespace',default='RobotDogConnector')
+    namespace_declare=DeclareLaunchArgument(
+            'namespace',
+            default_value=namespace,
+            description='Name of the RobotDogConnector node'
+        )
     return LaunchDescription([
+            namespace_declare,
             DeclareLaunchArgument(
                 name='publish_tf',
                 default_value='True',
@@ -29,8 +35,8 @@ def generate_launch_description():
                     'laser_scan_topic' : 'scan',
                     'odom_topic' : 'odom',
                     'publish_tf' : LaunchConfiguration('publish_tf'),
-                    'base_frame_id' : 'base_footprint',
-                    'odom_frame_id' : 'odom',
+                    'base_frame_id' : PythonExpression(["'",namespace,"'+","'/base_footprint'"]),
+                    'odom_frame_id' : PythonExpression(["'",namespace,"'+","'/odom'"]),
                     'init_pose_from_topic' : '',
                     'freq' : 5.0}],
             ),
