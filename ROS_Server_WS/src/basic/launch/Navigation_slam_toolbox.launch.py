@@ -117,7 +117,7 @@ def generate_launch_description():
             'params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async_loc.yaml'),
             'map':map,
             'initial_pose':init_pose
-        }.items()
+        }.items(),
     )
     # localizer_launch = IncludeLaunchDescription(
     #     PythonLaunchDescriptionSource(localizer_launch_path),
