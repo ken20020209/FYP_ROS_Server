@@ -5,6 +5,3 @@
 	path = ROS_Server_WS/src/slam_toolbox
 	url = https://github.com/ken20020209/slam_toolbox.git
 	branch = foxy-devel
-[submodule "ROS_Server_WS/src/navigation2"]
-	path = ROS_Server_WS/src/navigation2
-	url = https://github.com/ken20020209/navigation2.git
