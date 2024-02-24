@@ -66,6 +66,7 @@ class Navigation(Node):
         return goal_pose
 
     def moveToPoint(self,request:MoveToPoint.Request,response:MoveToPoint.Response):
+        self.navigator.cancelTask()
         goal_pose = self._createPoseStamped(request.pose)
         response.result='failed'
         if self.navigator.goToPose(goal_pose):
@@ -74,6 +75,7 @@ class Navigation(Node):
         return response
     
     def moveToPoints(self,request:MoveToPoints.Request,response:MoveToPoints.Response):
+        self.navigator.cancelTask()
         goal_poses = []
         for pose in request.poses:
             goal_poses.append(self._createPoseStamped(pose))
@@ -85,6 +87,7 @@ class Navigation(Node):
         return response
     
     def patrolPoints(self,request:PatrolPoints.Request,response:PatrolPoints.Response):
+        self.navigator.cancelTask()
         goal_poses = []
         for pose in request.poses:
             goal_poses.append(self._createPoseStamped(pose))
