@@ -16,6 +16,7 @@ import rclpy
 from rclpy.node import Node
 from message.srv import RegisterDog,GetDogList,UnregisterDog
 from message.msg import DogStatus
+from std_msgs.msg import Int32
 
 def startController(port,rosDomainId):
     os.environ['ROS_DOMAIN_ID'] = str(rosDomainId)
@@ -35,6 +36,8 @@ class RobotDogConnector(Node):
         self.getDogListService = self.create_service(GetDogList,'dog/list',self.getDogList)
         self.unregisterDogService = self.create_service(UnregisterDog,'dog/unreg',self.unregisterDog)
 
+        self.statuspub = self.create_publisher(Int32,'dog/status',10)
+
         #set timer to check the dog status
         self.create_timer(5,self.checkDogStatus)
 
@@ -48,6 +51,12 @@ class RobotDogConnector(Node):
                 self.unregisterDog(UnregisterDog.Request(dog_id=key),UnregisterDog.Response())
             else:
                 item["life"] -=5
+        
+        #publish the server status
+        msg = Int32()
+        msg.data = 1
+        self.statuspub.publish(msg)
+        
     
     def registerDog(self,request:RegisterDog.Request, response:RegisterDog.Response):
         if(request.dog_id in self.dogList or request.dog_id==""):
