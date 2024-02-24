@@ -36,7 +36,7 @@ class RobotDogConnector(Node):
         self.getDogListService = self.create_service(GetDogList,'dog/list',self.getDogList)
         self.unregisterDogService = self.create_service(UnregisterDog,'dog/unreg',self.unregisterDog)
 
-        self.statuspub = self.create_publisher(Int32,'dog/status',10)
+        self.statuspub = self.create_publisher(Int32,'server/status',10)
 
         #set timer to check the dog status
         self.create_timer(5,self.checkDogStatus)
@@ -56,7 +56,7 @@ class RobotDogConnector(Node):
         msg = Int32()
         msg.data = 1
         self.statuspub.publish(msg)
-        
+
     
     def registerDog(self,request:RegisterDog.Request, response:RegisterDog.Response):
         if(request.dog_id in self.dogList or request.dog_id==""):
