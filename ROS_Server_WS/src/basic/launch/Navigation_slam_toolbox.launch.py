@@ -21,7 +21,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition
 from launch.substitutions import EnvironmentVariable
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node,PushRosNamespace
+from launch_ros.actions import Node,PushRosNamespace,SetParameter
 
 
 def generate_launch_description():
@@ -29,7 +29,7 @@ def generate_launch_description():
     basic_dir = get_package_share_directory('basic')
 
     navigation_launch_path = PathJoinSubstitution(
-        [FindPackageShare('nav2_bringup'), 'launch', 'navigation_launch.py']
+        [FindPackageShare('basic'), 'navigation.launch.py']
     )
 
     slam_launch_path = PathJoinSubstitution(
@@ -137,6 +137,7 @@ def generate_launch_description():
     )
 
     group = GroupAction(actions=[
+        
         PushRosNamespace(namespace),
         rf2o_launch_no_tf,
         rf2o_launch_tf,
