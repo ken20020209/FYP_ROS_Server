@@ -31,21 +31,15 @@ class Controller(Node):
         self.camera_sp = None
         self.navigation_sp = None
         self.slam_sp = None
-
-        self.camera_switch_service = self.create_service(SwitchService,'controller/camera_switch',self.camera_switch)
         self.navigation_switch_service = self.create_service(SwitchService,'controller/navigation_switch',self.navigation)
         self.slam_switch_service= self.create_service(SwitchService,'controller/slam_switch',self.slam_switch)
 
-        self.camera_pub = self.create_publisher(Bool,'controller/camera',10)
         self.navigation_pub = self.create_publisher(Bool,'controller/navigation',10)
         self.slam_pub = self.create_publisher(Bool,'controller/slam',10)
 
         self.timer= self.create_timer(1,self.timer_callback)
 
     def timer_callback(self):
-        camera_msg = Bool()
-        camera_msg.data = self.camera
-        self.camera_pub.publish(camera_msg)
 
         navigation_msg = Bool()
         navigation_msg.data = self.navigation
@@ -55,22 +49,6 @@ class Controller(Node):
         slam_msg.data = self.slam
         self.slam_pub.publish(slam_msg)
 
-    def camera_switch(self,request,response):
-        response.result = "fail to switch the camera"
-        if request.switch_service == self.camera:
-            response.result = "the camera is already in the state"
-            return response
-        if request.switch_service == True:
-            self.camera = True
-            response.result = "the camera started"
-            self.camera_sp = subprocess.Popen(["ros2","launch","basic","Camera.launch.py",f"namespace:={self.get_namespace()}"],env=os.environ.copy())
-        else:
-            self.camera = False
-            response.result = "the camera closed"
-            self.camera_sp.send_signal(signal.SIGINT)
-            self.camera_sp = None
-            
-        return response
     def navigation_switch(self,request,response):
         response.result = "fail to switch the navigation"
         if self.slam == True:
