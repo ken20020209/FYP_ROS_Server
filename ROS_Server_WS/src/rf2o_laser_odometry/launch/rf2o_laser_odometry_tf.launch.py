@@ -13,7 +13,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    namespace=LaunchConfiguration('namespace',default='RobotDogConnector')
+    namespace=LaunchConfiguration('namespace',default='')
     namespace_declare=DeclareLaunchArgument(
             'namespace',
             default_value=namespace,
