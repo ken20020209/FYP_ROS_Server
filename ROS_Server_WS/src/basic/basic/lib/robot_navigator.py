@@ -131,6 +131,7 @@ class BasicNavigator(Node):
         self.debug("Waiting for 'NavigateToPose' action server")
         while not self.nav_to_pose_client.wait_for_server(timeout_sec=1.0):
             self.info("'NavigateToPose' action server not available, waiting...")
+            return
 
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose = pose
@@ -167,6 +168,7 @@ class BasicNavigator(Node):
         self.debug("Waiting for 'FollowWaypoints' action server")
         while not self.follow_waypoints_client.wait_for_server(timeout_sec=1.0):
             self.info("'FollowWaypoints' action server not available, waiting...")
+            return
 
         goal_msg = FollowWaypoints.Goal()
         goal_msg.poses = poses
@@ -190,6 +192,7 @@ class BasicNavigator(Node):
         self.debug("Waiting for Patrol 'FollowWaypoints' action server")
         while not self.follow_waypoints_client.wait_for_server(timeout_sec=1.0):
             self.info("'Patrol: FollowWaypoints' action server not available, waiting...")
+            return
 
         goal_msg = FollowWaypoints.Goal()
         goal_msg.poses = poses

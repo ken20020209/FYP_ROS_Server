@@ -25,7 +25,7 @@ class Navigation(Node):
         super().__init__('name')
 
         self.isTaskComplete=True
-        self.feedback = None
+        self.feedback = "idle"
 
         self.navigator = BasicNavigator()
         self.navigator.lifecycleStartup()
