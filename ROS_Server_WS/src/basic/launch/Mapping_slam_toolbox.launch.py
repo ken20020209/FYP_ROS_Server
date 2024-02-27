@@ -80,7 +80,7 @@ def generate_launch_description():
         name='ekf_filter_node',
         output='screen',
         condition=IfCondition(ekf_node_start),
-        parameters=[os.path.join(basic_dir, 'config','ekf.yaml'), {'use_sim_time': LaunchConfiguration('sim')}],
+        parameters=[os.path.join(basic_dir, 'config','ekf.yaml')],
         remappings=[('/odometry/filtered','/odom')]
     )
     navigation_launch=IncludeLaunchDescription(
@@ -93,8 +93,8 @@ def generate_launch_description():
     slam_launch=IncludeLaunchDescription(
         PythonLaunchDescriptionSource(slam_launch_path),
         launch_arguments={
-            'use_sim_time': LaunchConfiguration("sim"),
-            'slam_params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
+            'use_sim_time': "False",
+            'params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
         }.items()
     )
     rviz2=Node(

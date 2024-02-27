@@ -33,7 +33,7 @@ def generate_launch_description():
                 output='screen',
                 parameters=[{
                     'laser_scan_topic' : 'scan',
-                    'odom_topic' : 'odom',
+                    'odom_topic' : 'odom_rf2o',
                     'publish_tf' : LaunchConfiguration('publish_tf'),
                     'base_frame_id' : PythonExpression(["'",namespace,"'+","'base_footprint'"]),
                     'odom_frame_id' : PythonExpression(["'",namespace,"'+","'odom'"]),
