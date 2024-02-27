@@ -29,7 +29,7 @@ def generate_launch_description():
     basic_dir = get_package_share_directory('basic')
 
     navigation_launch_path = PathJoinSubstitution(
-        [FindPackageShare('basic'), 'navigation.launch.py']
+        [FindPackageShare('nav2_bringup'),'launch', 'navigation_launch.py']
     )
 
     slam_launch_path = PathJoinSubstitution(
