@@ -32,6 +32,7 @@ class Camera(Node):
         # self.subCamera = self.create_subscription(Image, 'camera/raw', self.subCammera, 10)
         self.subCamera = self.create_subscription(CompressedImage, 'camera/raw', self.subCammera, 10)
         self.pubCamera = self.create_publisher(CompressedImage, 'camera/processed', 10)
+        self.pubCameraRaw = self.create_publisher(Image, 'camera/processed/raw', 10)
         self.subCameraSetting = self.create_subscription(Int32, 'camera/setting', self.subSetting, 10)
         self.bridge = CvBridge()
         self.img = None
@@ -50,6 +51,11 @@ class Camera(Node):
         self.img_effected = self.processor.process(self.img)
         msg_effected = self.bridge.cv2_to_compressed_imgmsg(self.img_effected)
         self.pubCamera.publish(msg_effected)
+
+        # for rviz2 display
+        msg_msg_effected= self.bridge.cv2_to_imgmsg(self.img_effected)
+        self.pubCameraRaw.publish(msg_msg_effected)
+
         
     def process(self,):
         raise NotImplementedError
