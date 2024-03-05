@@ -27,6 +27,20 @@ class Controller(Node):
         self.camera = False
         self.navigation = False
         self.slam = False
+        self.env= os.environ.copy()
+        self.env["DISPLAY"] = ":"+self.env["ROS_DOMAIN_ID"]
+
+        #start Xvnc and novnc
+        offset = int(self.env["ROS_DOMAIN_ID"])
+        Xvnc_port = 5900 + offset
+        novnc_port = 6080 + offset
+        
+        #remember to install the Xvnc and novnc
+        self._logger.info("start Xvnc and novnc")
+        self.Xvnc_sp = subprocess.Popen(["Xvnc",f":{offset}","-geometry","1920x1080","-depth","24","-SecurityTypes","none"],env=self.env)
+        self.novnc_sp = subprocess.Popen(["/usr/share/novnc/utils/launch.sh","--listen",str(novnc_port),"--vnc","localhost:"+str(Xvnc_port)],env=self.env)
+
+
 
         self.camera_sp = None
         self.navigation_sp = None
@@ -60,7 +74,10 @@ class Controller(Node):
         if request.switch_service == True:
             self.navigation = True
             response.result = "the navigation started"
-            self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py",f"namespace:={self.get_namespace()}"],env=os.environ.copy())
+            if(self.get_namespace != ""):
+                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
+            else:
+                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py"],env=self.env)
         else:
             self.navigation = False
             response.result = "the navigation closed"
@@ -78,7 +95,10 @@ class Controller(Node):
         if request.switch_service == True:
             self.slam = True
             response.result = "the slam started"
-            self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py",f"namespace:={self.get_namespace()}"],env=os.environ.copy())
+            if(self.get_namespace != ""):
+                self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
+            else:
+                self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py"],env=self.env)
         else:
             self.slam = False
             response.result = "the slam closed"
