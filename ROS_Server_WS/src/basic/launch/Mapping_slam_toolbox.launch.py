@@ -97,6 +97,12 @@ def generate_launch_description():
             'params_file': os.path.join(basic_dir, 'config', 'mapper_params_online_async.yaml')
         }.items()
     )
+    navgation=Node(
+        package='basic',
+        executable='Navigation',
+        name='NavigationServer',
+        output='screen'
+    )
     rviz2=Node(
         package='rviz2',
         executable='rviz2',
@@ -112,6 +118,7 @@ def generate_launch_description():
                                      ekf_node,
                                      navigation_launch,
                                      slam_launch,
+                                     navgation,
                                      rviz2])
 
     launchConfiguration=LaunchDescription()

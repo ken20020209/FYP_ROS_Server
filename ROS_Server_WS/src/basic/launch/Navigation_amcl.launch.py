@@ -107,6 +107,12 @@ def generate_launch_description():
             'map': map
         }.items()
     )
+    navgation=Node(
+        package='basic',
+        executable='Navigation',
+        name='NavigationServer',
+        output='screen'
+    )
     rviz2=Node(
         package='rviz2',
         executable='rviz2',
@@ -123,6 +129,7 @@ def generate_launch_description():
         ekf_node,
         navigation_launch,
         localizer_launch,
+        navgation,
         rviz2])
     
     launch_description = LaunchDescription()
