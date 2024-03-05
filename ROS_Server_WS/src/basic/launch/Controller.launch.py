@@ -28,6 +28,7 @@ def generate_launch_description():
             parameters=[
                 {'port': LaunchConfiguration('port'),
                  'call_services_in_new_thread': False,
+                 'send_action_goals_in_new_thread':False
             }]
         ),
         Node(
