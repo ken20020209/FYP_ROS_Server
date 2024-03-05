@@ -11,6 +11,11 @@ def generate_launch_description():
             description='Port for the rosbridge_websocket'
         ),
         Node(
+            package='rosapi',
+            namespace=LaunchConfiguration('namespace'),
+            executable='rosapi_node'
+        ),
+        Node(
             package='basic',
             namespace='',
             executable='Connector'

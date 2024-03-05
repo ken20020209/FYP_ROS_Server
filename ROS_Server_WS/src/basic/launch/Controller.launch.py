@@ -28,6 +28,12 @@ def generate_launch_description():
             parameters=[{'port': LaunchConfiguration('port')}]
         ),
         Node(
+            package='rosapi',
+            namespace=LaunchConfiguration('namespace'),
+            executable='rosapi_node'
+        ),
+            
+        Node(
             package='basic',
             # namespace=LaunchConfiguration('namespace'),
             executable='Camera',
