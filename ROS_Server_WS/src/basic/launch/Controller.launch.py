@@ -25,7 +25,10 @@ def generate_launch_description():
             package='rosbridge_server',
             namespace=LaunchConfiguration('namespace'),
             executable='rosbridge_websocket',
-            parameters=[{'port': LaunchConfiguration('port')}]
+            parameters=[
+                {'port': LaunchConfiguration('port'),
+                 'call_services_in_new_thread': False,
+            }]
         ),
         Node(
             package='rosapi',
