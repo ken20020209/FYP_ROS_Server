@@ -39,7 +39,7 @@ class RobotDogConnector(Node):
         self.statuspub = self.create_publisher(Int32,'server/status',10)
 
         #set timer to check the dog status
-        self.create_timer(5,self.checkDogStatus)
+        self.create_timer(1,self.checkDogStatus)
 
     def checkDogStatus(self):
         #check the dog status
@@ -50,7 +50,7 @@ class RobotDogConnector(Node):
                 self._logger.error(f"dog {key} is not response")
                 self.unregisterDog(UnregisterDog.Request(dog_id=key),UnregisterDog.Response())
             else:
-                item["life"] -=5
+                item["life"] -=1
         
         #publish the server status
         msg = Int32()
@@ -67,7 +67,7 @@ class RobotDogConnector(Node):
         port=self.ports.pop(0)
         rosDomainId=self.rosDomainIds.pop(0)
         #add the port and rosDomainId to the list
-        self.dogList[request.dog_id] = {"port":port,"rosDomainId":rosDomainId}
+        self.dogList[request.dog_id] = {"port":port,"rosDomainId":rosDomainId,"type":request.type}
         response.id = rosDomainId
         
         self._logger.info(f"register dog {request.dog_id} with port {port} and rosDomainId {rosDomainId}")
@@ -81,16 +81,17 @@ class RobotDogConnector(Node):
         #start the controller and rosbrige with port and rosDomainId with subprocess
         sp_env=os.environ.copy()
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
-        sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
+        # sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
+        sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env)
         self.dogList[request.dog_id]["process"] = sp
         #---------------------------------------------------
 
         #create the dog/status subscriber
-        self.dogList[request.dog_id]["life"] = 10
+        self.dogList[request.dog_id]["life"] = 5
         self.dogList[request.dog_id]["battery"] = 100
         def statusCallback(msg):
             # self._logger.error(f"get status from {request.dog_id}")
-            self.dogList[request.dog_id]["life"] +=5
+            self.dogList[request.dog_id]["life"] =5
             self.dogList[request.dog_id]["battery"] = msg.battery
             if(msg.status==-1):
                 self.dogList[request.dog_id]["life"] = -1
@@ -145,6 +146,8 @@ class RobotDogConnector(Node):
             response.dog_ids.append(key)
             response.ports.append(item["port"])
             response.batterys.append(item["battery"])
+            response.domain_ids.append(item["rosDomainId"])
+            response.types.append(item["type"])
         return response
     
 

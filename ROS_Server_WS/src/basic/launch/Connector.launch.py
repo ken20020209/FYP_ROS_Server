@@ -12,7 +12,7 @@ def generate_launch_description():
         ),
         Node(
             package='rosapi',
-            namespace=LaunchConfiguration('namespace'),
+            # namespace=LaunchConfiguration('namespace'),
             executable='rosapi_node'
         ),
         Node(

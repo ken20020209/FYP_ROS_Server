@@ -45,7 +45,7 @@ class Controller(Node):
         self.camera_sp = None
         self.navigation_sp = None
         self.slam_sp = None
-        self.navigation_switch_service = self.create_service(SwitchService,'controller/navigation_switch',self.navigation)
+        self.navigation_switch_service = self.create_service(SwitchService,'controller/navigation_switch',self.navigation_switch)
         self.slam_switch_service= self.create_service(SwitchService,'controller/slam_switch',self.slam_switch)
 
         self.navigation_pub = self.create_publisher(Bool,'controller/navigation',10)
@@ -75,9 +75,9 @@ class Controller(Node):
             self.navigation = True
             response.result = "the navigation started"
             if(self.get_namespace != ""):
-                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
+                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation_slam_toolbox.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
             else:
-                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation.launch.py"],env=self.env)
+                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation_slam_toolbox.launch.py"],env=self.env)
         else:
             self.navigation = False
             response.result = "the navigation closed"
@@ -96,9 +96,9 @@ class Controller(Node):
             self.slam = True
             response.result = "the slam started"
             if(self.get_namespace != ""):
-                self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
+                self.slam_sp = subprocess.Popen(["ros2","launch","basic","Mapping_slam_toolbox.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
             else:
-                self.slam_sp = subprocess.Popen(["ros2","launch","basic","Slam.launch.py"],env=self.env)
+                self.slam_sp = subprocess.Popen(["ros2","launch","basic","Mapping_slam_toolbox.launch.py"],env=self.env)
         else:
             self.slam = False
             response.result = "the slam closed"
