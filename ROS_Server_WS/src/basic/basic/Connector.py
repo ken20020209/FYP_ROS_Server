@@ -38,6 +38,7 @@ class RobotDogConnector(Node):
 
         self.statuspub = self.create_publisher(Int32,'server/status',10)
 
+        self.status=1
         #set timer to check the dog status
         self.create_timer(1,self.checkDogStatus)
 
@@ -54,7 +55,7 @@ class RobotDogConnector(Node):
         
         #publish the server status
         msg = Int32()
-        msg.data = 1
+        msg.data = self.status
         self.statuspub.publish(msg)
 
     
@@ -70,7 +71,7 @@ class RobotDogConnector(Node):
         self.dogList[request.dog_id] = {"port":port,"rosDomainId":rosDomainId,"type":request.type}
         response.id = rosDomainId
         
-        self._logger.info(f"register dog {request.dog_id} with port {port} and rosDomainId {rosDomainId}")
+        self._logger.info(f"register dog {request.dog_id} with port {port} and rosDomainId {rosDomainId} type {request.type}")
 
         #start the controller and rosbrige with port and rosDomainId with multiprocessing 
         #it can't kill node with terminate
@@ -97,8 +98,8 @@ class RobotDogConnector(Node):
                 self.dogList[request.dog_id]["life"] = -1
         self.dogList[request.dog_id]["getDogStatus"] = self.create_subscription(DogStatus,f'{request.dog_id}/dog/status',statusCallback,10)
         
+        self._logger.info(f"register dog success")
 
-    
         return response
     def unregisterDog(self,request:UnregisterDog.Request, response:UnregisterDog.Response):
         #check if the dog_id is registered
@@ -149,6 +150,10 @@ class RobotDogConnector(Node):
             response.domain_ids.append(item["rosDomainId"])
             response.types.append(item["type"])
         return response
+    def destroy_node(self) -> numpy.bool:
+        self.status=-1
+        self.checkDogStatus()
+        return super().destroy_node()
     
 
 def main(args=None):
