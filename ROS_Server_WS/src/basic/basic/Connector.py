@@ -88,11 +88,11 @@ class RobotDogConnector(Node):
         #---------------------------------------------------
 
         #create the dog/status subscriber
-        self.dogList[request.dog_id]["life"] = 5
+        self.dogList[request.dog_id]["life"] = 10
         self.dogList[request.dog_id]["battery"] = 100
         def statusCallback(msg):
             # self._logger.error(f"get status from {request.dog_id}")
-            self.dogList[request.dog_id]["life"] =5
+            self.dogList[request.dog_id]["life"] =10
             self.dogList[request.dog_id]["battery"] = msg.battery
             if(msg.status==-1):
                 self.dogList[request.dog_id]["life"] = -1
