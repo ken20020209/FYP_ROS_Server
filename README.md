@@ -14,4 +14,4 @@ docker:
 
 build:docker build -t {name} -f docker/Dockerfile .
 
-run:docker run -it --rm {name}
+run:docker run -it --rm --net=host {name}
