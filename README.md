@@ -5,7 +5,6 @@ ros2 foxy
 
 build ros server
 
-cd ROS_Server_WS
 
 rosdep install --from-paths src --ignore-src -r -y
 

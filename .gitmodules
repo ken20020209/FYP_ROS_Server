@@ -1,7 +1,7 @@
-[submodule "ROS_Server_WS/src/rosbridge_suite"]
-	path = ROS_Server_WS/src/rosbridge_suite
+[submodule "src/rosbridge_suite"]
+	path = src/rosbridge_suite
 	url = https://github.com/ken20020209/rosbridge_suite
-[submodule "ROS_Server_WS/src/slam_toolbox"]
-	path = ROS_Server_WS/src/slam_toolbox
+[submodule "src/slam_toolbox"]
+	path = src/slam_toolbox
 	url = https://github.com/ken20020209/slam_toolbox.git
 	branch = foxy-devel

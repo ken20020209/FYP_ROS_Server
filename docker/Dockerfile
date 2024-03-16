@@ -29,16 +29,15 @@ ENV SHELL /bin/bash
 # CMD ["/bin/bash"]
 LABEL maintainer="ken20020209 <ken20020209@gmail.com>"
 
-ADD /src /ROS_Server_WS/src
+ADD /src /src
 RUN . /opt/ros/foxy/setup.sh && \
-    cd /ROS_Server_WS &&\ 
     rosdep install --from-paths src --ignore-src -r -y &&\
     colcon build
 
 ENV ROS_DISTRO=foxy
 ENV ROS_DOMAIN_ID=16
 
-# CMD [ "source","/ROS_Server_WS/install/setup.bash" ]
+# CMD [ "source","/install/setup.bash" ]
 # CMD [ "ros2","launch","basic","Connector.launch.py" ]
 
 COPY /docker/entrypoint.sh /
