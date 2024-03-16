@@ -1,4 +1,4 @@
-# FYP_Server
+# FYP_ROS_Server
 
 requirement:
 ros2 foxy
