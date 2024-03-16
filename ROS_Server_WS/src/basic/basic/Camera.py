@@ -11,6 +11,7 @@ import numpy
 #ros2 lib
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile,ReliabilityPolicy
 from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import Int32
 
@@ -30,9 +31,9 @@ class Camera(Node):
     def __init__(self,name='Camera'):
         super().__init__(name)
         # self.subCamera = self.create_subscription(Image, 'camera/raw', self.subCammera, 10)
-        self.subCamera = self.create_subscription(CompressedImage, 'camera/raw', self.subCammera, 10)
-        self.pubCamera = self.create_publisher(CompressedImage, 'camera/processed', 10)
-        self.pubCameraRaw = self.create_publisher(Image, 'camera/processed/raw', 10)
+        self.subCamera = self.create_subscription(CompressedImage, 'camera/raw', self.subCammera, QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
+        self.pubCamera = self.create_publisher(CompressedImage, 'camera/processed',  QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
+        self.pubCameraRaw = self.create_publisher(Image, 'camera/processed/raw',  QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
         self.subCameraSetting = self.create_subscription(Int32, 'camera/setting', self.subSetting, 10)
         self.bridge = CvBridge()
         self.img = None
