@@ -1,16 +1,16 @@
 # FYP_ROS_Server
-
-requirement:
+provide a websocket api to control robot
+# requirement:
 ros2 foxy
 
-build ros server
+# build ros server
 
 
 rosdep install --from-paths src --ignore-src -r -y
 
 colcon build
 
-docker:
+# docker:
 
 build:docker build -t {name} -f docker/Dockerfile .
 
