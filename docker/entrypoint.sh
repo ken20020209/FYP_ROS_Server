@@ -2,4 +2,5 @@
 
 . /opt/ros/foxy/setup.sh
 . /fyp/install/setup.sh
-ros2 launch basic Connector.launch.py
+# ros2 launch basic Connector.launch.py
+python3 /fyp/startConnector.py

@@ -30,6 +30,9 @@ ENV SHELL /bin/bash
 LABEL maintainer="ken20020209 <ken20020209@gmail.com>"
 
 ADD /src /fyp/src
+ADD /super_client_configuration_file.xml /fyp
+ADD startConnector.py /fyp
+
 RUN . /opt/ros/foxy/setup.sh && \
     cd /fyp && \
     rosdep install --from-paths src --ignore-src -r -y && \
