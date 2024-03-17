@@ -87,7 +87,7 @@ class RobotDogConnector(Node):
         sp_env=os.environ.copy()
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
         if(self.get_parameter('discoverServer').get_parameter_value().string_value!="127.0.0.1"):
-            sp_env['ROS_DISCOVERY_SERVER'] = f"{self.get_parameter('discoverServer').get_parameter_value().string_value}:{11811+rosDomainId}"
+            sp_env['DISCOVERY_SERVER_PORT'] = f"{11811+rosDomainId}"
         # sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
         sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env)
         self.dogList[request.dog_id]["process"] = sp

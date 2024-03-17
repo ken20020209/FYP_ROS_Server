@@ -26,9 +26,10 @@ if(discovery_server_ip!="127.0.0.1"):
     for i in range(17,36):
         Process(target=lambda: os.system(f"fastdds discovery -i 0 -p {11811+i} > /dev/null")).start()
     # cmd+=f' && fastdds discovery -i 0'
-    # cmd+=f' && export FASTRTPS_DEFAULT_PROFILES_FILE={os.path.dirname(os.path.abspath(__file__))}/super_client_configuration_file.xml' 
-    cmd+=f" && export ROS_SUPER_CLIENT=TRUE"
-    cmd+=f' && export ROS_DISCOVERY_SERVER={discovery_server_ip}:11811'
+    cmd+=f' && export FASTRTPS_DEFAULT_PROFILES_FILE={os.path.dirname(os.path.abspath(__file__))}/super_client_configuration_file.xml' 
+    # cmd+=f" && export ROS_SUPER_CLIENT=TRUE"
+    cmd+=f' && export DISCOVERY_SERVER_PORT=11811'
+    # cmd+=f' && export ROS_DISCOVERY_SERVER={discovery_server_ip}:11811'
 cmd+=f"&& ros2 launch basic Connector.launch.py discoverServer:={discovery_server_ip}"
 cmd+=f"'"
 os.system(cmd)
