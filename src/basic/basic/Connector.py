@@ -27,10 +27,14 @@ class RobotDogConnector(Node):
     dogList:dict = {}
     #save the port and rosDomainId will arrange each dog
     ports:list=[i for i in range(9091,9120)]
-    rosDomainIds:list = [i for i in range(17,50)]
+    rosDomainIds:list = [i for i in range(17,36)]
 
     def __init__(self,name='RobotDogConnector'):
         super().__init__(name)
+
+        #declare the parameter
+        self.declare_parameter('discoverServer','127.0.0.1')
+
         #register the service
         self.registerService = self.create_service(RegisterDog,'dog/reg',self.registerDog)
         self.getDogListService = self.create_service(GetDogList,'dog/list',self.getDogList)
@@ -82,6 +86,8 @@ class RobotDogConnector(Node):
         #start the controller and rosbrige with port and rosDomainId with subprocess
         sp_env=os.environ.copy()
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
+        if(self.get_parameter('discoverServer').get_parameter_value().string_value!="127.0.0.1"):
+            sp_env['ROS_DISCOVERY_SERVER'] = f"{self.get_parameter('discoverServer').get_parameter_value().string_value}:{11811+rosDomainId}"
         # sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
         sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env)
         self.dogList[request.dog_id]["process"] = sp

@@ -10,6 +10,12 @@ def generate_launch_description():
             default_value='9090',
             description='Port for the rosbridge_websocket'
         ),
+        DeclareLaunchArgument(
+            'discoverServer',
+            default_value='127.0.0.1',
+            description='The ip of the discovery server'
+        )
+        ,
         Node(
             package='rosapi',
             # namespace=LaunchConfiguration('namespace'),
@@ -18,7 +24,8 @@ def generate_launch_description():
         Node(
             package='basic',
             namespace='',
-            executable='Connector'
+            executable='Connector',
+            parameters=[{'discoverServer': LaunchConfiguration('discoverServer')}]
         ),
         Node(
             package='rosbridge_server',
