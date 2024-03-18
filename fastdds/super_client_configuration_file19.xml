@@ -12,7 +12,7 @@
                                     <locator>
                                         <udpv4>
                                             <address>127.0.0.1</address>
-                                            <port>${DISCOVERY_SERVER_PORT}</port>
+                                            <port>11830</port>
                                         </udpv4>
                                     </locator>
                                 </metatrafficUnicastLocatorList>

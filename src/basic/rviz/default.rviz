@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /GlobalCostmap1/Map1
         - /Image1
+        - /Image1/Topic1
       Splitter Ratio: 0.5
     Tree Height: 280
   - Class: rviz_common/Selection
@@ -53,80 +54,13 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_footprint:
-          Value: true
-        base_link:
-          Value: true
-        camera_link:
-          Value: true
-        imu_link:
-          Value: true
-        laser_frame:
-          Value: true
-        laser_link:
-          Value: true
-        lf_hip_link:
-          Value: true
-        lf_lower_leg_link:
-          Value: true
-        lf_upper_leg_link:
-          Value: true
-        lh_hip_link:
-          Value: true
-        lh_lower_leg_link:
-          Value: true
-        lh_upper_leg_link:
-          Value: true
-        map:
-          Value: true
-        odom:
-          Value: true
-        rf_hip_link:
-          Value: true
-        rf_lower_leg_link:
-          Value: true
-        rf_upper_leg_link:
-          Value: true
-        rh_hip_link:
-          Value: true
-        rh_lower_leg_link:
-          Value: true
-        rh_upper_leg_link:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        map:
-          odom:
-            base_footprint:
-              base_link:
-                camera_link:
-                  {}
-                imu_link:
-                  {}
-                laser_frame:
-                  {}
-                laser_link:
-                  {}
-                lf_hip_link:
-                  lf_upper_leg_link:
-                    lf_lower_leg_link:
-                      {}
-                lh_hip_link:
-                  lh_upper_leg_link:
-                    lh_lower_leg_link:
-                      {}
-                rf_hip_link:
-                  rf_upper_leg_link:
-                    rf_lower_leg_link:
-                      {}
-                rh_hip_link:
-                  rh_upper_leg_link:
-                    rh_lower_leg_link:
-                      {}
+        {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988079071
@@ -295,14 +229,14 @@ Visualization Manager:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
+        Reliability Policy: Best Effort
         Value: /camera/processed/raw
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Fixed Frame: map
-    Frame Rate: 60
+    Frame Rate: 30
   Name: root
   Tools:
     - Class: rviz_default_plugins/Interact
@@ -377,5 +311,3 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1920
-  X: 0
-  Y: 0
