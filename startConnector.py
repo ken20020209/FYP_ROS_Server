@@ -23,8 +23,11 @@ cmd+=f"source {os.path.dirname(os.path.abspath(__file__))}/install/setup.bash"
 if(discovery_server_ip!="127.0.0.1"):
     print(f"start with discovery server {discovery_server_ip}")
     Process(target=lambda: os.system(f"fastdds discovery -i 0 -p {11811} > /dev/null")).start()
-    for i in range(17,36):
-        Process(target=lambda: os.system(f"fastdds discovery -i 0 -p {11811+i} > /dev/null")).start()
+
+
+    # for i in range(17,36):
+    #     Process(target=lambda: os.system(f"fastdds discovery -i 0 -p {11811+i} > /dev/null")).start()
+
     # cmd+=f' && fastdds discovery -i 0'
     cmd+=f' && export FASTRTPS_DEFAULT_PROFILES_FILE={os.path.dirname(os.path.abspath(__file__))}/fastdds/super_client_configuration_file.xml' 
     # cmd+=f" && export ROS_SUPER_CLIENT=TRUE"

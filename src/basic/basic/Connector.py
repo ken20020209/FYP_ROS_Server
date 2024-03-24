@@ -89,6 +89,8 @@ class RobotDogConnector(Node):
         if(self.get_parameter('discoverServer').get_parameter_value().string_value!="127.0.0.1"):
             # sp_env['DISCOVERY_SERVER_PORT'] = f"{11811+rosDomainId}"
             sp_env['FASTRTPS_DEFAULT_PROFILES_FILE']=sp_env['FASTRTPS_DEFAULT_PROFILES_FILE'][:-4]+f"{rosDomainId}.xml"
+            self.dogList[request.dog_id]["fastdds_discovery"] = Process(target=lambda: os.system(f"fastdds discovery -i 0 -p {11811+rosDomainId}"))
+            self.dogList[request.dog_id]["fastdds_discovery"].start()
         # sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
         sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env)
         self.dogList[request.dog_id]["process"] = sp
@@ -124,6 +126,8 @@ class RobotDogConnector(Node):
         # p.terminate()
 
         #unregister the dog with dog_id kill the rosbridge with subprocess
+        if(self.get_parameter('discoverServer').get_parameter_value().string_value!="127.0.0.1"):
+            self.dogList[request.dog_id]["fastdds_discovery"].terminate()
         sp:subprocess.Popen=self.dogList[request.dog_id]["process"]
         sp.send_signal(signal.SIGINT)
         #---------------------------------------------------
