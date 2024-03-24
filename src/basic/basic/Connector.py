@@ -66,7 +66,14 @@ class RobotDogConnector(Node):
     def registerDog(self,request:RegisterDog.Request, response:RegisterDog.Response):
         if(request.dog_id in self.dogList or request.dog_id==""):
             self._logger.error("regsterDog: dog_id is already registered or empty")
-            response.id = -1
+            # response.id = -1
+
+            #new vesrion that if same dog_id is repeated, give back the port and rosDomainId
+            #BUG if the dog_id is repeated. The one controller server will have two physical dog
+            self._logger.info(f"give back the port and rosDomainId")
+            response.id = self.dogList[request.dog_id]["rosDomainId"]
+
+            
             return response
         #get the port and rosDomainId
         port=self.ports.pop(0)
