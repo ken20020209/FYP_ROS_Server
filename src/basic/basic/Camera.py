@@ -98,7 +98,11 @@ class Camera(Node):
             "effect": self.effect[self.cursetting]
         })
         #todo missing error handling
-        response = requests.request("POST", self.url, headers=headers, data=payload)
+        try:
+            response = requests.request("POST", self.url, headers=headers, data=payload)
+        except:
+            return frame
+
         response = json.loads(response.text)
         image = base64_to_cv2(response["image"])
         return image

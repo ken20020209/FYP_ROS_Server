@@ -15,7 +15,7 @@ import signal
 import rclpy
 from rclpy.node import Node
 from message.srv import RegisterDog,GetDogList,UnregisterDog
-from message.msg import DogStatus
+from message.msg import DogStatus,DogList
 from std_msgs.msg import Int32
 
 def startController(port,rosDomainId):
@@ -38,6 +38,7 @@ class RobotDogConnector(Node):
         #register the service
         self.registerService = self.create_service(RegisterDog,'dog/reg',self.registerDog)
         self.getDogListService = self.create_service(GetDogList,'dog/list',self.getDogList)
+        self.pubDogListTopic = self.create_publisher(DogList,'dog/list',10)
         self.unregisterDogService = self.create_service(UnregisterDog,'dog/unreg',self.unregisterDog)
 
         self.statuspub = self.create_publisher(Int32,'server/status',10)
@@ -45,7 +46,20 @@ class RobotDogConnector(Node):
         self.status=1
         #set timer to check the dog status
         self.create_timer(1,self.checkDogStatus)
+        self.create_timer(2,self.pubDogList_timer)
 
+    def pubDogList_timer(self):
+        msg = DogList()
+        msg.battery = 100
+        msg.status = 1
+        for key,item in self.dogList.items():
+            msg.dog_ids.append(key)
+            msg.ports.append(item["port"])
+            msg.batterys.append(item["battery"])
+            msg.domain_ids.append(item["rosDomainId"])
+            msg.types.append(item["type"])
+        self.pubDogListTopic.publish(msg)
+        
     def checkDogStatus(self):
         #check the dog status
         for key in list(self.dogList.keys()):

@@ -46,6 +46,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/StopNavigation.srv"
   "srv/SwitchService.srv"
 
+  "msg/DogList.msg"
   "msg/DogStatus.msg"
 
   DEPENDENCIES geometry_msgs
