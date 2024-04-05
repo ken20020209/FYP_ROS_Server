@@ -7,7 +7,16 @@ import subprocess
 import socket
 import json
 
-discovery_server = "discoveryserver.ddns.net"
+
+# if(os.path.exists(f"{os.path.dirname(os.path.abspath(__file__))}/install/setup.bash")):
+#     with open(f"{os.path.dirname(os.path.abspath(__file__))}/env.json") as f:
+#         env=json.load(f)
+#         for k,v in env.items():
+#             k=k.upper()
+#             os.environ[k]=v
+
+discovery_server =os.getenv("discover_server" ,"discoveryserver.ddns.net")
+
 
 def get_ip_address(domain_name):
     try:

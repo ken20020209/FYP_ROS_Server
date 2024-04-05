@@ -10,9 +10,15 @@ def generate_launch_description():
             default_value='',
             description='Namespace for the controller'
         ),
+        DeclareLaunchArgument(
+            'camera_url',
+            default_value='http://localhost:80/effect',
+            description='URL for camera effect'
+        ),
         Node(
             package='basic',
             namespace=LaunchConfiguration('namespace'),
-            executable='Camera'
+            executable='Camera',
+            parameters=[{'url': LaunchConfiguration('camera_url')}]
         ),
     ])

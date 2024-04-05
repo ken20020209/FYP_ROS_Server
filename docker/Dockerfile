@@ -32,6 +32,7 @@ LABEL maintainer="ken20020209 <ken20020209@gmail.com>"
 ADD /src /fyp/src
 # ADD /super_client_configuration_file.xml /fyp
 ADD startConnector.py /fyp
+# ADD ./env.json /fyp/env.json
 
 RUN . /opt/ros/foxy/setup.sh && \
     cd /fyp && \
@@ -42,8 +43,14 @@ RUN . /opt/ros/foxy/setup.sh && \
 ENV ROS_DISTRO=foxy
 ENV ROS_DOMAIN_ID=16
 
+ENV CAMERA_URL="http://localhost:80/effect"
+ENV DISCOVERY_SERVER="discoveryserver.ddns.net"
+ENV FILE_PATH="/2023fyp/map"
+     
+
 # CMD [ "source","/install/setup.bash" ]
 # CMD [ "ros2","launch","basic","Connector.launch.py" ]
+
 
 COPY /docker/entrypoint.sh /
 ENTRYPOINT [ "sh","/entrypoint.sh" ]
