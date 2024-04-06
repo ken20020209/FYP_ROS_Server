@@ -49,7 +49,11 @@ class Mapping(Node):
         headers = {
         'Content-Type': 'application/json'
         }
-        response = requests.request("POST", self.apiDatabseUrl+'/api/auth/login', headers=headers, data=payload)
+        try:
+            response = requests.request("POST", self.apiDatabseUrl+'/api/auth/login', headers=headers, data=payload)
+        except Exception as e:
+            self.get_logger().error(f"Failed to Get Token: {e}")
+            return None
         data=response.json().get('data')
         if(data is None):
             return None
