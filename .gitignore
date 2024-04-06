@@ -2,4 +2,7 @@ build/
 install/
 log/
 
+*.pyc
+
+
 test.py

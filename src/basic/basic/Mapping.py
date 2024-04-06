@@ -9,6 +9,7 @@ from cv_bridge import CvBridge
 import numpy
 from typing import List
 import requests
+import json
 
 
 #ros2 lib
@@ -33,12 +34,30 @@ class Mapping(Node):
         self.map_storage_path = os.getenv('MAP_STORAGE_PATH',default_map_storage_path)
 
         self.apiDatabseUrl=os.getenv('API_DATABASE_URL','http://localhost:5000')
-        self.apiDatabseUrl = f"{self.apiDatabseUrl}/api/map"
+        self.apiDatabseUrlMap = f"{self.apiDatabseUrl}/api/map"
 
         if not os.path.exists(self.map_storage_path):
             os.makedirs(self.map_storage_path)
             self.get_logger().info(f"Create Map Storage Path: {self.map_storage_path}")
 
+        
+    def getToken(self):
+        payload = json.dumps({
+            "username": os.getenv('API_DATABASE_USERNAME','admin'),
+            "password": os.getenv('API_DATABASE_PASSWORD','12345678')
+            })
+        headers = {
+        'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", self.apiDatabseUrl+'/api/auth/login', headers=headers, data=payload)
+        data=response.json().get('data')
+        if(data is None):
+            return None
+        token = data.get('token')
+        if(token):
+            return "Bearer "+token
+        else:
+            return None
 
     def save_map_callback(self,request,response):
         
@@ -102,12 +121,17 @@ class Mapping(Node):
 
         # upload to api-database server
         
-        url = self.apiDatabseUrl
+        url = self.apiDatabseUrlMap
 
         map_png_path=f"{map_path}.png"
         map_posegraph_path=f"{map_path}.posegraph"
         map_posegraphData_path=f"{map_path}.data"
 
+        token = self.getToken()
+        if(token is None):
+            response.status = False
+            response.result = "Failed to Get Token"
+            return response
 
         payload = {'robot_id': '0',
         'name': request.name}
@@ -116,7 +140,9 @@ class Mapping(Node):
         ('posegraph',(map_posegraph_path,open(map_posegraph_path,'rb'),'image/png')),
         ('posegraphData',(map_posegraphData_path,open(map_posegraphData_path,'rb'),'application/octet-stream'))
         ]
-        headers = {}
+        headers = {
+        'Authorization': token
+        }
         try:
             responseApi = requests.request("POST", url, headers=headers, data=payload, files=files)
         except Exception as e:
