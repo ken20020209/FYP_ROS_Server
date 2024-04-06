@@ -27,7 +27,7 @@ def startController(port,rosDomainId):
 class RobotDogConnector(Node):
     #save the dog that registered
     dogList:dict = {}
-    api_database_robotList:dict = {}
+    api_database_robotList:dict = None
     #save the port and rosDomainId will arrange each dog
     ports:list=[i for i in range(9091,9120)]
     rosDomainIds:list = [i for i in range(17,36)]
@@ -98,6 +98,7 @@ class RobotDogConnector(Node):
             return data
         
         robotList=getRobotList()
+        self.api_database_robotList={}
         if(robotList is None):
             return False
         for i in robotList:
@@ -136,7 +137,8 @@ class RobotDogConnector(Node):
     def registerDog(self,request:RegisterDog.Request, response:RegisterDog.Response):
         if(request.dog_id[0]=="/"):
             request.dog_id=request.dog_id[1:]
-        if(request.dog_id not in self.api_database_robotList):
+        
+        if(self.api_database_robotList and request.dog_id not in self.api_database_robotList):
             self._logger.error(f"register dog fail: {request.dog_id} is not in the api database")
             response.id = -1
             return response
