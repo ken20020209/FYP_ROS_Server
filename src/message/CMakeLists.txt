@@ -45,6 +45,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/FollowObject.srv"
   "srv/StopNavigation.srv"
   "srv/SwitchService.srv"
+  "srv/SaveMap.srv"
 
   "msg/DogList.msg"
   "msg/DogStatus.msg"
