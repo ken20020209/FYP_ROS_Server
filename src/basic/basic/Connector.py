@@ -172,8 +172,10 @@ class RobotDogConnector(Node):
         sp_env=os.environ.copy()
 
         #set up the environment variable
-
-        sp_env['ROBOT_ID'] = str(self.api_database_robotList[request.dog_id]["id"])
+        if(self.api_database_robotList):
+            sp_env['ROBOT_ID'] = str(self.api_database_robotList[request.dog_id]["id"])
+        else:
+            sp_env['ROBOT_ID'] = str(0)
         sp_env['ROBOT_NAME'] = str(request.dog_id)
         
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)

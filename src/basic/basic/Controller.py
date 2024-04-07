@@ -9,6 +9,7 @@ import cv2 as cv
 from cv_bridge import CvBridge
 import numpy
 from typing import List
+import requests
 
 #ros2 lib
 import rclpy
@@ -53,6 +54,14 @@ class Controller(Node):
 
         self.timer= self.create_timer(1,self.timer_callback)
 
+        default_map_storage_path = os.path.join(os.path.expanduser('~'),'data/temp/map')
+        self.map_storage_path = os.getenv('MAP_STORAGE_PATH',default_map_storage_path)
+        if not os.path.exists(self.map_storage_path):
+            os.makedirs(self.map_storage_path)
+            self.get_logger().info(f"Create Map Storage Path: {self.map_storage_path}")
+        self.apiDatabseUrl=os.getenv('API_DATABASE_URL','http://localhost:5000')
+        self.apiDatabseUrlMap = f"{self.apiDatabseUrl}/data/map"
+
     def timer_callback(self):
 
         navigation_msg = Bool()
@@ -72,12 +81,19 @@ class Controller(Node):
             response.result = "the navigation is already in the state"
             return response
         if request.switch_service == True:
+            if(self.getMap(request.map) == False):
+                response.result = "failed to get the map"
+                return response
+
             self.navigation = True
             response.result = "the navigation started"
+
+            mapPath=os.path.join(self.map_storage_path,request.map)
+            mapParam=f'map:={mapPath}'
             if(self.get_namespace != ""):
-                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation_slam_toolbox.launch.py",f"namespace:={self.get_namespace()}"],env=self.env)
+                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation_slam_toolbox.launch.py",f"namespace:={self.get_namespace()}",mapParam],env=self.env)
             else:
-                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation_slam_toolbox.launch.py"],env=self.env)
+                self.navigation_sp = subprocess.Popen(["ros2","launch","basic","Navigation_slam_toolbox.launch.py",mapParam],env=self.env)
         else:
             self.navigation = False
             response.result = "the navigation closed"
@@ -105,7 +121,35 @@ class Controller(Node):
             self.slam_sp.send_signal(signal.SIGINT)
             self.slam_sp = None
         return response
+    def getMap(self,name):
+        def download_file(url, folder_name):
+            local_filename = url.split("/")[-1]
+            path = os.path.join(folder_name, local_filename)
 
+            with requests.get(url, stream=True) as r:
+                if(r.status_code != 200):
+                    raise Exception(f"Failed to download file: {url}")
+                with open(path, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=1024 * 8):
+                        if chunk:
+                            f.write(chunk)
+                            f.flush()
+                            os.fsync(f.fileno())
+
+            return local_filename
+        # download map from database
+        url=self.apiDatabseUrlMap+"/"+name
+        data_url=url+".data"
+        posegraph_url=url+".posegraph"
+        try:
+            download_file(data_url,self.map_storage_path)
+            download_file(posegraph_url,self.map_storage_path)
+            return True
+        except Exception as e:
+            self.get_logger().error(f"Failed to download map: {e}")
+            return False
+        
+    
 def main(args=None):
     rclpy.init(args=args)
     controller = Controller()

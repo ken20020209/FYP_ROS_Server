@@ -111,6 +111,12 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('rviz')),
         arguments=['-d', os.path.join(basic_dir, 'rviz', 'nav2_default_view.rviz')],
     )
+    mapping=Node(
+        package='basic',
+        executable='Mapping',
+        name='MappingServer',
+        output='screen'
+    )
     
     groupAction=GroupAction(actions=[PushRosNamespace(namespace),
                                      rf2o_launch_no_tf,
@@ -119,7 +125,7 @@ def generate_launch_description():
                                      navigation_launch,
                                      slam_launch,
                                      navgation,
-                                     rviz2])
+                                     rviz2,mapping])
 
     launchConfiguration=LaunchDescription()
 
