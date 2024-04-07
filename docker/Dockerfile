@@ -50,7 +50,7 @@ ENV FILE_PATH="/2023fyp/map"
 
 # CMD [ "source","/install/setup.bash" ]
 # CMD [ "ros2","launch","basic","Connector.launch.py" ]
-
+COPY /fastdds /fyp/fastdds
 
 COPY /docker/entrypoint.sh /
 ENTRYPOINT [ "sh","/entrypoint.sh" ]
