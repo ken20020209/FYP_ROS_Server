@@ -27,7 +27,7 @@ def startController(port,rosDomainId):
 class RobotDogConnector(Node):
     #save the dog that registered
     dogList:dict = {}
-    api_database_robotList:dict = None
+    # api_database_robotList:dict = None
     #save the port and rosDomainId will arrange each dog
     ports:list=[i for i in range(9091,9120)]
     rosDomainIds:list = [i for i in range(17,36)]
@@ -52,14 +52,14 @@ class RobotDogConnector(Node):
         self.create_timer(2,self.pubDogList_timer)
 
         #fetch the robot list from the api database
-        self.apiDatabseUrl=os.getenv('API_DATABASE_URL','http://localhost:5000')
-        if self.fetchFormApiDatabase():
-            self._logger.info("fetch robot list from api database success")
-        else:
-            self._logger.error("fetch robot list from api database fail")
+        # self.apiDatabseUrl=os.getenv('API_DATABASE_URL','http://localhost:5000')
+        # if self.fetchFormApiDatabase():
+        #     self._logger.info("fetch robot list from api database success")
+        # else:
+        #     self._logger.error("fetch robot list from api database fail")
         self._logger.info("init robotDogConnector node")
 
-    def fetchFormApiDatabase(self):
+    def fetchFormApiDatabase(self,name)->int:
         def getToken():
             payload = json.dumps({
                 "username": os.getenv('API_DATABASE_USERNAME','admin'),
@@ -84,9 +84,10 @@ class RobotDogConnector(Node):
         if(self.token is None):
             return False
         os.environ['API_DATABASE_TOKEN'] = self.token
-        def getRobotList():
+        def getRobot():
             headers = {
-                'Authorization': self.token
+                'Authorization': self.token,
+                'name': name,
             }
             try:
                 response = requests.request("GET", self.apiDatabseUrl+'/api/robot', headers=headers)
@@ -97,13 +98,12 @@ class RobotDogConnector(Node):
                 return None
             return data
         
-        robotList=getRobotList()
-        self.api_database_robotList={}
-        if(robotList is None):
-            return False
-        for i in robotList:
-            self.api_database_robotList[i["name"]] = i
-        return True
+        robot=getRobot()
+        if(robot is None):
+            self.get_logger().error(f"fetch robot {name} from api database fail")
+            return 0
+        self.get_logger().info(f"fetch robot {name} from api database success")
+        return robot.get('id')
 
         
 
@@ -138,10 +138,10 @@ class RobotDogConnector(Node):
         if(request.dog_id[0]=="/"):
             request.dog_id=request.dog_id[1:]
         
-        if(self.api_database_robotList and request.dog_id not in self.api_database_robotList):
-            self._logger.error(f"register dog fail: {request.dog_id} is not in the api database")
-            response.id = -1
-            return response
+        # if(self.api_database_robotList and request.dog_id not in self.api_database_robotList):
+        #     self._logger.error(f"register dog fail: {request.dog_id} is not in the api database")
+        #     response.id = -1
+        #     return response
         if(request.dog_id in self.dogList or request.dog_id==""):
             self._logger.error("regsterDog: dog_id is already registered or empty")
             # response.id = -1
@@ -172,10 +172,10 @@ class RobotDogConnector(Node):
         sp_env=os.environ.copy()
 
         #set up the environment variable
-        if(self.api_database_robotList):
-            sp_env['ROBOT_ID'] = str(self.api_database_robotList[request.dog_id]["id"])
-        else:
-            sp_env['ROBOT_ID'] = str(0)
+
+        # get the robot id from the api database
+        sp_env['ROBOT_ID'] = str(self.fetchFormApiDatabase(request.dog_id))
+
         sp_env['ROBOT_NAME'] = str(request.dog_id)
         
         sp_env['ROS_DOMAIN_ID'] = str(rosDomainId)
