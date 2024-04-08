@@ -41,7 +41,7 @@ class Camera(Node):
 
         self.timer = self.create_timer(1, self.timer_callback)
 
-        self.declare_parameter('url','http://localhost:80/effect')
+        self.declare_parameter('url','http://localhost:8000/effect')
         self.url = self.get_parameter('url').value
 
         self.url= os.getenv('CAMERA_URL',self.url)
@@ -162,12 +162,12 @@ class Camera(Node):
         #todo missing error handling
         try:
             response = requests.request("POST", self.url, headers=headers, data=payload)
+            response = json.loads(response.text)
+            image = base64_to_cv2(response["image"])
+            return image
         except:
             return frame
 
-        response = json.loads(response.text)
-        image = base64_to_cv2(response["image"])
-        return image
     def writeRecord(self,frame):
         
         self.recordWidth = frame.shape[1]

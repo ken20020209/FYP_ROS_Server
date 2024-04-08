@@ -52,7 +52,7 @@ class RobotDogConnector(Node):
         self.create_timer(2,self.pubDogList_timer)
 
         #fetch the robot list from the api database
-        # self.apiDatabseUrl=os.getenv('API_DATABASE_URL','http://localhost:5000')
+        self.apiDatabseUrl=os.getenv('API_DATABASE_URL','http://localhost:5000')
         # if self.fetchFormApiDatabase():
         #     self._logger.info("fetch robot list from api database success")
         # else:
@@ -70,28 +70,33 @@ class RobotDogConnector(Node):
             }
             try:
                 response = requests.request("POST", self.apiDatabseUrl+'/api/auth/login', headers=headers, data=payload)
-            except:
+                data=response.json().get('data')
+                if(data is None):
+                    return None
+                token = data.get('token')
+                if(token):
+                    return "Bearer "+token
+                else:
+                    return None
+            except Exception as e:
+                self._logger.error(str(e))
+                # self._logger.error("fetch token from api database fail")
                 return None
-            data=response.json().get('data')
-            if(data is None):
-                return None
-            token = data.get('token')
-            if(token):
-                return "Bearer "+token
-            else:
-                return None
+
         self.token=getToken()
         if(self.token is None):
-            return False
+            self.get_logger().error("fetch token from api database fail")
+            return 0
         os.environ['API_DATABASE_TOKEN'] = self.token
         def getRobot():
             headers = {
                 'Authorization': self.token,
-                'name': name,
             }
             try:
-                response = requests.request("GET", self.apiDatabseUrl+'/api/robot', headers=headers)
+                response = requests.request("GET", self.apiDatabseUrl+f'/api/robot?name={name}', headers=headers)
             except:
+                return None
+            if(response.status_code!=200):
                 return None
             data=response.json().get('data')
             if(data is None):
@@ -99,10 +104,13 @@ class RobotDogConnector(Node):
             return data
         
         robot=getRobot()
-        if(robot is None):
+        if(robot is None ):
             self.get_logger().error(f"fetch robot {name} from api database fail")
             return 0
+        # self._logger.info(str(robot))
         self.get_logger().info(f"fetch robot {name} from api database success")
+        self.get_logger().info(f"robot id is {robot.get('id')}")
+
         return robot.get('id')
 
         
