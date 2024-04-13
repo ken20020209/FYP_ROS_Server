@@ -10,6 +10,7 @@ from cv_bridge import CvBridge
 import numpy
 from typing import Dict
 from multiprocessing import Process
+import threading
 import subprocess
 import signal
 
@@ -190,10 +191,15 @@ class RobotDogConnector(Node):
         if(self.get_parameter('discoverServer').get_parameter_value().string_value!="127.0.0.1"):
             # sp_env['DISCOVERY_SERVER_PORT'] = f"{11811+rosDomainId}"
             sp_env['FASTRTPS_DEFAULT_PROFILES_FILE']=sp_env['FASTRTPS_DEFAULT_PROFILES_FILE'][:-4]+f"{rosDomainId}.xml"
-            self.dogList[request.dog_id]["fastdds_discovery"] = Process(target=lambda: os.system(f"fastdds discovery -i 0 -p {11811+rosDomainId}"))
-            self.dogList[request.dog_id]["fastdds_discovery"].start()
+            # def runFastddsDiscovery():
+            #     os.system(f"fastdds discovery -i 0 -p {11811+rosDomainId}")
+            # self.dogList[request.dog_id]["fastdds_discovery"] = Process(target=runFastddsDiscovery)
+            # self.dogList[request.dog_id]["fastdds_discovery"].start()
+
+            self.dogList[request.dog_id]["fastdds_discovery"] = subprocess.Popen([f"fastdds discovery -i 0 -p {11811+rosDomainId}"],env=sp_env,shell=True)
+
         # sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}",f"namespace:={request.dog_id}"],env=sp_env)
-        sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env)
+        sp = subprocess.Popen(["ros2","launch","basic","Controller.launch.py",f"port:={port}"],env=sp_env, close_fds=True, preexec_fn = os.setsid)
         self.dogList[request.dog_id]["process"] = sp
         #---------------------------------------------------
 
@@ -228,9 +234,10 @@ class RobotDogConnector(Node):
 
         #unregister the dog with dog_id kill the rosbridge with subprocess
         if(self.get_parameter('discoverServer').get_parameter_value().string_value!="127.0.0.1"):
-            self.dogList[request.dog_id]["fastdds_discovery"].terminate()
+            self.dogList[request.dog_id]["fastdds_discovery"].send_signal(signal.SIGINT)
         sp:subprocess.Popen=self.dogList[request.dog_id]["process"]
-        sp.send_signal(signal.SIGINT)
+        os.killpg(sp.pid,signal.SIGUSR1)
+        # sp.send_signal(signal.SIGINT)
         #---------------------------------------------------
 
         #remove the dog/status subscriber

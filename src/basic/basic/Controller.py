@@ -98,6 +98,7 @@ class Controller(Node):
             self.navigation = False
             response.result = "the navigation closed"
             self.navigation_sp.send_signal(signal.SIGINT)
+
             self.navigation_sp = None
         return response
     def slam_switch(self,request,response):
@@ -119,6 +120,7 @@ class Controller(Node):
             self.slam = False
             response.result = "the slam closed"
             self.slam_sp.send_signal(signal.SIGINT)
+
             self.slam_sp = None
         return response
     def getMap(self,name):
