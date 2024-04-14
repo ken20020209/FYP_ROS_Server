@@ -25,6 +25,94 @@ def startController(port,rosDomainId):
     os.environ['ROS_DOMAIN_ID'] = str(rosDomainId)
     os.system(f"ros2 launch basic Controller.launch.py port:={port}")
 
+def fetchPortsAndRosDomainIds() -> tuple:
+    import requests
+    try:
+        url = os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')
+        payload = {}
+        headers = {}
+        response = requests.request("GET", url, headers=headers, data=payload)
+        if(response.status_code!=200):
+            return None
+        data=response.json()
+        port=data.get('port')
+        rosDomainId=data.get('rosDomainId')
+        if(port is None or rosDomainId is None):
+            return None
+        return port,rosDomainId
+    except Exception as e:
+        print(str(e))
+        return None
+
+def putPortsAndRosDomainIds(port,rosDomainId) -> bool:
+    try:
+        import requests
+        url = os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')
+        payload = json.dumps({
+            "port":port,
+            "rosDomainId":rosDomainId
+        })
+        headers = {
+        'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", url, headers=headers, data=payload)
+        if(response.status_code!=200):
+            return False
+        return True
+    except Exception as e:
+        print(str(e))
+        return False
+def gethostIP():
+    try:
+        url = os.getenv('ROS_PROXY_IP_URL','http://localhost:9088/api/ros/ip')
+        payload = {}
+        headers = {}
+        response = requests.request("GET", url, headers=headers, data=payload)
+        if(response.status_code!=200):
+            return ''
+        data=response.json()
+        ip=data.get('ip')
+        if(ip is None):
+            return ''
+        return ip
+    except Exception as e:
+        print(str(e))
+        return ''
+def putHostIP(ip) -> bool:
+    try:
+        import requests
+        url = os.getenv('ROS_PROXY_IP_URL','http://localhost:9089/api/ros/ip')
+        payload = json.dumps({
+            "ip":ip
+        })
+        headers = {
+        'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", url, headers=headers, data=payload)
+        if(response.status_code!=200):
+            return False
+        return True
+    except Exception as e:
+        print(str(e))
+        return False
+
+def deleteHostIP(ip) -> bool:
+    try:
+        import requests
+        url = os.getenv('ROS_PROXY_IP_URL','http://localhost:9089/api/ros/ip')
+        payload = json.dumps({
+            "ip":ip
+        })
+        headers = {
+        'Content-Type': 'application/json'
+        }
+        response = requests.request("DELETE", url, headers=headers, data=payload)
+        if(response.status_code!=200):
+            return False
+        return True
+    except Exception as e:
+        print(str(e))
+        return False
 class RobotDogConnector(Node):
     #save the dog that registered
     dogList:dict = {}
@@ -59,6 +147,12 @@ class RobotDogConnector(Node):
         # else:
         #     self._logger.error("fetch robot list from api database fail")
         self._logger.info("init robotDogConnector node")
+
+        self.ip=gethostIP()
+        if(self.ip!=''):
+            putHostIP(self.ip)
+            
+
 
     def fetchFormApiDatabase(self,name)->int:
         def getToken():
@@ -163,11 +257,25 @@ class RobotDogConnector(Node):
             
             return response
         #get the port and rosDomainId
-        port=self.ports.pop(0)
-        rosDomainId=self.rosDomainIds.pop(0)
+        if(not os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')=="http://localhost:9089/api/ros/port"):
+            fetchData=fetchPortsAndRosDomainIds()
+            if(fetchData is None):
+                self._logger.error("register dog fail: can't get port and rosDomainId")
+                response.id = -1
+                return response
+            port,rosDomainId=fetchData
+        else:
+            port=self.ports.pop(0)
+            rosDomainId=self.rosDomainIds.pop(0)
+
+
         #add the port and rosDomainId to the list
         self.dogList[request.dog_id] = {"port":port,"rosDomainId":rosDomainId,"type":request.type}
         response.id = rosDomainId
+        if(self.ip==''):
+            self.ip=gethostIP()
+            putHostIP(self.ip)
+        response.ip = self.ip
         
         self._logger.info(f"register dog {request.dog_id} with port {port} and rosDomainId {rosDomainId} type {request.type}")
 
@@ -245,8 +353,16 @@ class RobotDogConnector(Node):
         
 
         #add the port and rosDomainId back to the list
-        self.ports.append(port)
-        self.rosDomainIds.append(rosDomainId)
+
+        if(not os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')=="http://localhost:9089/api/ros/port"):
+            putData=putPortsAndRosDomainIds(port,rosDomainId)
+            if(not putData):
+                self._logger.error("unregister dog fail: can't put port and rosDomainId")
+                response.result = False
+                return response
+        else:
+            self.ports.append(port)
+            self.rosDomainIds.append(rosDomainId)
         # self.dogList.pop(request.dog_id)
         del self.dogList[request.dog_id]
 
@@ -272,6 +388,8 @@ class RobotDogConnector(Node):
     def destroy_node(self) -> numpy.bool:
         self.status=-1
         self.checkDogStatus()
+        if(self.ip!=''):
+            deleteHostIP(self.ip)
         return super().destroy_node()
     
 

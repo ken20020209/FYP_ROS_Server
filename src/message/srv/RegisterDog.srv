@@ -2,3 +2,4 @@ string dog_id
 string type
 ---
 int32 id
+string ip
