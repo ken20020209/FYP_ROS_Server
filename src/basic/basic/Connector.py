@@ -28,7 +28,7 @@ def startController(port,rosDomainId):
 def fetchPortsAndRosDomainIds() -> tuple:
     import requests
     try:
-        url = os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')
+        url = os.getenv('ROS_PROXY_URL','http://localhost:9089')+'/api/ros/port'
         payload = {}
         headers = {}
         response = requests.request("GET", url, headers=headers, data=payload)
@@ -47,7 +47,7 @@ def fetchPortsAndRosDomainIds() -> tuple:
 def putPortsAndRosDomainIds(port,rosDomainId) -> bool:
     try:
         import requests
-        url = os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')
+        url = os.getenv('ROS_PROXY_URL','http://localhost:9089')+'/api/ros/port'
         payload = json.dumps({
             "port":port,
             "rosDomainId":rosDomainId
@@ -81,7 +81,7 @@ def gethostIP():
 def putHostIP(ip) -> bool:
     try:
         import requests
-        url = os.getenv('ROS_PROXY_IP_URL','http://localhost:9089/api/ros/ip')
+        url = os.getenv('ROS_PROXY_URL','http://localhost:9089') +'/api/ros/ip'
         payload = json.dumps({
             "ip":ip
         })
@@ -99,7 +99,7 @@ def putHostIP(ip) -> bool:
 def deleteHostIP(ip) -> bool:
     try:
         import requests
-        url = os.getenv('ROS_PROXY_IP_URL','http://localhost:9089/api/ros/ip')
+        url = os.getenv('ROS_PROXY_URL','http://localhost:9089')+'/api/ros/ip'
         payload = json.dumps({
             "ip":ip
         })
@@ -151,6 +151,7 @@ class RobotDogConnector(Node):
         self.ip=gethostIP()
         if(self.ip!=''):
             putHostIP(self.ip)
+            self._logger.info(f"get host ip {self.ip}")
             
 
 
@@ -257,13 +258,14 @@ class RobotDogConnector(Node):
             
             return response
         #get the port and rosDomainId
-        if(not os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')=="http://localhost:9089/api/ros/port"):
-            fetchData=fetchPortsAndRosDomainIds()
-            if(fetchData is None):
-                self._logger.error("register dog fail: can't get port and rosDomainId")
-                response.id = -1
-                return response
-            port,rosDomainId=fetchData
+        if(os.getenv('ROS_PROXY_ENABLE','False')=="True"):
+            if(not os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')=="http://localhost:9089/api/ros/port"):
+                fetchData=fetchPortsAndRosDomainIds()
+                if(fetchData is None):
+                    self._logger.error("register dog fail: can't get port and rosDomainId")
+                    response.id = -1
+                    return response
+                port,rosDomainId=fetchData
         else:
             port=self.ports.pop(0)
             rosDomainId=self.rosDomainIds.pop(0)
@@ -274,7 +276,8 @@ class RobotDogConnector(Node):
         response.id = rosDomainId
         if(self.ip==''):
             self.ip=gethostIP()
-            putHostIP(self.ip)
+            self._logger.info(f"get host ip {self.ip}")
+        putHostIP(self.ip)
         response.ip = self.ip
         
         self._logger.info(f"register dog {request.dog_id} with port {port} and rosDomainId {rosDomainId} type {request.type}")
@@ -353,13 +356,13 @@ class RobotDogConnector(Node):
         
 
         #add the port and rosDomainId back to the list
-
-        if(not os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')=="http://localhost:9089/api/ros/port"):
-            putData=putPortsAndRosDomainIds(port,rosDomainId)
-            if(not putData):
-                self._logger.error("unregister dog fail: can't put port and rosDomainId")
-                response.result = False
-                return response
+        if(os.getenv('ROS_PROXY_ENABLE','False')=="True"):
+            if(not os.getenv('ROS_PROXY_URL','http://localhost:9089/api/ros/port')=="http://localhost:9089/api/ros/port"):
+                putData=putPortsAndRosDomainIds(port,rosDomainId)
+                if(not putData):
+                    self._logger.error("unregister dog fail: can't put port and rosDomainId")
+                    response.result = False
+                    return response
         else:
             self.ports.append(port)
             self.rosDomainIds.append(rosDomainId)
