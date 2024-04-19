@@ -66,7 +66,7 @@ while count<10 and discovery_server_ip!="127.0.0.1":
     print(f"get host ip from {discovery_server_ip}")
     ip=gethostIP()
     if(ip==""):
-        sleep(1)
+        sleep(5)
         continue
     discovery_server_ip=ip
     count+=1
