@@ -12,6 +12,6 @@ colcon build
 
 # docker:
 
-build:docker build -t {name} -f docker/Dockerfile .
+build:docker build -t ken20020209/fyp_ros_server:latest -f docker/dockerfile .
 
-run:docker run -it --rm --net=host {name}
+run:docker run -it --rm --net=host  ken20020209/fyp_ros_server:latest 
